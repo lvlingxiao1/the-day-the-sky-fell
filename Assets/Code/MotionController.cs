@@ -14,6 +14,7 @@ public class MotionController : MonoBehaviour {
     float zooming;
     bool jumpPressed;
     bool grounded;
+    bool interactBtnDown;
     float groundCheckDistance;
     Rigidbody rb;
     Transform cameraTransform;
@@ -23,6 +24,10 @@ public class MotionController : MonoBehaviour {
     AudioManager audioManager;
     Text debugText;
     Transform modelTransform;
+
+    const int NORMAL = 0;
+    const int CLIMBING = 1;
+    int status = NORMAL;
 
     void Awake() {
         rb = GetComponent<Rigidbody>();
@@ -40,6 +45,7 @@ public class MotionController : MonoBehaviour {
         goingForward = Input.GetAxis("Vertical");
         goingRight = Input.GetAxis("Horizontal");
         jumpPressed = Input.GetButton("Jump");
+        interactBtnDown = Input.GetButtonDown("Interact");
         zooming = Input.GetAxis("Mouse ScrollWheel");
 
         if (Input.GetMouseButton(0)) {
@@ -49,22 +55,23 @@ public class MotionController : MonoBehaviour {
             cameraTransform.eulerAngles = cameraRotation;
             cameraMoved = true;
         } else if (Input.GetMouseButton(1)) {
-            Vector3 rotation = transform.eulerAngles;
-            Vector3 cameraRotation = cameraTransform.eulerAngles;
+            if (status == NORMAL) {
+                Vector3 rotation = transform.eulerAngles;
+                Vector3 cameraRotation = cameraTransform.eulerAngles;
 
-            if (cameraMoved) {
-                rotation.y = cameraRotation.y + Input.GetAxis("Mouse X") * cameraSpeed;
-                cameraMoved = false;
-            } else {
-                rotation.y += Input.GetAxis("Mouse X") * cameraSpeed;
+                if (cameraMoved) {
+                    rotation.y = cameraRotation.y + Input.GetAxis("Mouse X") * cameraSpeed;
+                    cameraMoved = false;
+                } else {
+                    rotation.y += Input.GetAxis("Mouse X") * cameraSpeed;
+                }
+
+                cameraRotation.x -= Input.GetAxis("Mouse Y");
+                cameraRotation.y = 0f;
+                transform.eulerAngles = rotation;
+                cameraTransform.localEulerAngles = cameraRotation;
             }
-
-            cameraRotation.x -= Input.GetAxis("Mouse Y");
-            cameraRotation.y = 0f;
-            transform.eulerAngles = rotation;
-            cameraTransform.localEulerAngles = cameraRotation;
         }
-
         if (zooming != 0) {
             mainCamera.fieldOfView += zooming * 8;
             if (mainCamera.fieldOfView > 80) mainCamera.fieldOfView = 80;
@@ -73,14 +80,6 @@ public class MotionController : MonoBehaviour {
 
         moveMagnitude = Mathf.Sqrt(goingForward * goingForward + goingRight * goingRight);
         animator.SetFloat("forward", moveMagnitude);
-        if (moveMagnitude > 0.1) {
-            modelTransform.forward = goingForward * transform.forward + goingRight * transform.right;
-            if (grounded) {
-                audioManager.PlayIfNotPlaying("walk");
-            }
-        } else {
-            audioManager.Stop("walk");
-        }
     }
 
     private void FixedUpdate() {
@@ -94,11 +93,51 @@ public class MotionController : MonoBehaviour {
                 audioManager.Play("jump");
             }
         }
+
+
+        bool hit = Physics.Raycast(rb.position + Vector3.up, transform.forward, out RaycastHit hitInfo, groundCheckDistance);
+        if (hit && hitInfo.collider.tag == "climbable") {
+            if (interactBtnDown) {
+                if (status == NORMAL) {
+                    rb.useGravity = false;
+                    status = CLIMBING;
+                    animator.SetBool("climb", true);
+                } else if (status == CLIMBING) {
+                    rb.useGravity = true;
+                    status = NORMAL;
+                    animator.SetBool("climb", false);
+                }
+            }
+        }
+
+
+
+        Vector3 newVelocity;
+        switch (status) {
+            case NORMAL:
+                if (moveMagnitude > 0.1) {
+                    modelTransform.forward = goingForward * transform.forward + goingRight * transform.right;
+                    if (grounded) {
+                        audioManager.PlayIfNotPlaying("walk");
+                    }
+                } else {
+                    audioManager.Stop("walk");
+                }
+                newVelocity = forwardSpeed * goingForward * transform.forward + forwardSpeed * goingRight * transform.right;
+                newVelocity.y = rb.velocity.y;
+                rb.velocity = newVelocity;
+                break;
+            case CLIMBING:
+                newVelocity = 2.0f * goingForward * Vector3.up;
+                rb.velocity = newVelocity;
+                break;
+        }
+        debugText.text = $"{grounded} {jumpPressed} v={rb.velocity} {status}";
+        Debug.DrawRay(rb.position + Vector3.up, transform.forward * 0.5f, new Color(1, 0, 0));
+
         //rb.MovePosition(rb.position + forawrdSpeed * goingForward * transform.forward
         //   + forawrdSpeed * goingRight * transform.right);
-        Vector3 newVelocity = forwardSpeed * goingForward * transform.forward + forwardSpeed * goingRight * transform.right;
-        newVelocity.y = rb.velocity.y;
-        rb.velocity = newVelocity;
+
         //rb.position += modelTransform.forward * moveMagnitude * forwardSpeed * Time.fixedDeltaTime;
     }
 }
