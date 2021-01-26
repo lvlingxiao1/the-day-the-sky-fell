@@ -4,7 +4,7 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - climbable
+  - ladder
   layers:
   - Default
   - TransparentFX
