@@ -7,7 +7,7 @@ public class CameraCollision : MonoBehaviour {
     Vector3 cameraRestPosition;
     Vector3 cameraRestDirection;
     float restDistance;
-    Text debugText;
+    //Text debugText;
     Transform cameraTransform;
     int environmentLayerMask;
 
@@ -16,7 +16,7 @@ public class CameraCollision : MonoBehaviour {
         cameraRestPosition = cameraTransform.localPosition;
         restDistance = cameraRestPosition.magnitude;
         cameraRestDirection = cameraRestPosition.normalized;
-        debugText = GameObject.Find("debugText").GetComponent<Text>();
+        //debugText = GameObject.Find("debugText").GetComponent<Text>();
         environmentLayerMask = LayerMask.GetMask("environment");
     }
 
@@ -30,6 +30,6 @@ public class CameraCollision : MonoBehaviour {
         } else {
             cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, cameraRestPosition, 0.3f);
         }
-        debugText.text = $"{transform.rotation * cameraRestPosition} {transform.position} {restDistance} {hit}";
+        //debugText.text = $"{transform.rotation * cameraRestPosition} {transform.position} {restDistance} {hit}";
     }
 }

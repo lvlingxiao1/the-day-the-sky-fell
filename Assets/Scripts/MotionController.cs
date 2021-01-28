@@ -20,7 +20,6 @@ public class MotionController : MonoBehaviour {
     float moveMagnitude;
     bool grounded;
     float groundCheckDistance;
-    bool cameraMoved = false;
     enum States {
         NORMAL,
         LADDER_ENTER,
@@ -33,18 +32,17 @@ public class MotionController : MonoBehaviour {
     // components
     Rigidbody rb;
     Transform cameraTransform;
-    Camera mainCamera;
     Animator animator;
     AudioManager audioManager;
     Text debugText;
     Transform modelTransform;
+    Vector3 cameraForward;
 
 
     void Awake() {
         rb = GetComponent<Rigidbody>();
         cameraTransform = GameObject.Find("CameraTransform").transform;
-        mainCamera = cameraTransform.gameObject.GetComponentInChildren<Camera>();
-        modelTransform = GameObject.Find("ybot").transform;
+        modelTransform = GameObject.Find("PlayerModel").transform;
         animator = modelTransform.GetComponent<Animator>();
         groundCheckDistance = GetComponent<CapsuleCollider>().height / 2 + 0.1f;
         audioManager = FindObjectOfType<AudioManager>();
@@ -68,25 +66,9 @@ public class MotionController : MonoBehaviour {
             cameraRotation.y += Input.GetAxis("Mouse X") * cameraSpeed;
             cameraRotation.x -= Input.GetAxis("Mouse Y");
             cameraTransform.eulerAngles = cameraRotation;
-            cameraMoved = true;
-        } else if (Input.GetMouseButton(1)) {
-            if (state == States.NORMAL) {
-                Vector3 rotation = transform.eulerAngles;
-                Vector3 cameraRotation = cameraTransform.eulerAngles;
-
-                if (cameraMoved) {
-                    rotation.y = cameraRotation.y + Input.GetAxis("Mouse X") * cameraSpeed;
-                    modelTransform.forward = transform.forward;
-                    cameraMoved = false;
-                } else {
-                    rotation.y += Input.GetAxis("Mouse X") * cameraSpeed;
-                }
-
-                cameraRotation.x -= Input.GetAxis("Mouse Y");
-                cameraRotation.y = 0f;
-                transform.eulerAngles = rotation;
-                cameraTransform.localEulerAngles = cameraRotation;
-            }
+            cameraForward.x = cameraTransform.forward.x;
+            cameraForward.z = cameraTransform.forward.z;
+            cameraForward.Normalize();
         }
 
         moveMagnitude = Mathf.Sqrt(goingForward * goingForward + goingRight * goingRight);
@@ -128,7 +110,7 @@ public class MotionController : MonoBehaviour {
         animator.SetFloat("forward", moveMagnitude);
         animator.SetBool("grounded", grounded);
 
-        //debugText.text = $"{grounded} {jumpPressed} v={rb.velocity} {state} interact={(interactDetected ? hitInfo.collider.name : "")}";
+        debugText.text = $"{grounded} {jumpPressed} cam:{cameraForward} {cameraTransform.right} interact={(interactDetected ? hitInfo.collider.name : "")}";
     }
 
     private void FixedUpdate() {
@@ -142,7 +124,7 @@ public class MotionController : MonoBehaviour {
                     }
                 }
                 if (moveMagnitude > 0.1) {
-                    Vector3 targetDirection = goingForward * transform.forward + goingRight * transform.right;
+                    Vector3 targetDirection = goingForward * cameraForward + goingRight * cameraTransform.right;
                     modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.3f);
                     if (grounded) {
                         audioManager.PlayIfNotPlaying("walk");
@@ -150,7 +132,7 @@ public class MotionController : MonoBehaviour {
                 } else {
                     audioManager.Stop("walk");
                 }
-                newVelocity = forwardSpeed * goingForward * transform.forward + forwardSpeed * goingRight * transform.right;
+                newVelocity = forwardSpeed * goingForward * cameraForward + forwardSpeed * goingRight * cameraTransform.right;
                 newVelocity.y = rb.velocity.y;
                 rb.velocity = newVelocity;
                 break;
