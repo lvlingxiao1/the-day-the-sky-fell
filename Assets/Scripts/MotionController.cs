@@ -52,11 +52,15 @@ public class MotionController : MonoBehaviour {
     }
 
     void Update() {
-        goingForward = Input.GetAxis("Vertical");
-        goingRight = Input.GetAxis("Horizontal");
+        float verticleInput = Input.GetAxis("Vertical");
+        float horizontalInput = Input.GetAxis("Horizontal");
         jumpPressed = Input.GetButton("Jump");
         interactBtnDown = Input.GetButtonDown("Interact");
         cancelBtnDown = Input.GetButtonDown("Cancel");
+
+        // elliptical grid mapping: https://arxiv.org/ftp/arxiv/papers/1509/1509.06344.pdf
+        goingForward = verticleInput * Mathf.Sqrt(1 - horizontalInput * horizontalInput * 0.5f);
+        goingRight = horizontalInput * Mathf.Sqrt(1 - verticleInput * verticleInput * 0.5f);
 
         // camera control
         if (Input.GetMouseButton(0)) {
@@ -124,7 +128,7 @@ public class MotionController : MonoBehaviour {
         animator.SetFloat("forward", moveMagnitude);
         animator.SetBool("grounded", grounded);
 
-        debugText.text = $"{grounded} {jumpPressed} v={rb.velocity} {state} interact={(interactDetected ? hitInfo.collider.name : "")}";
+        //debugText.text = $"{grounded} {jumpPressed} v={rb.velocity} {state} interact={(interactDetected ? hitInfo.collider.name : "")}";
     }
 
     private void FixedUpdate() {
@@ -138,7 +142,8 @@ public class MotionController : MonoBehaviour {
                     }
                 }
                 if (moveMagnitude > 0.1) {
-                    modelTransform.forward = goingForward * transform.forward + goingRight * transform.right;
+                    Vector3 targetDirection = goingForward * transform.forward + goingRight * transform.right;
+                    modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.3f);
                     if (grounded) {
                         audioManager.PlayIfNotPlaying("walk");
                     }
@@ -160,7 +165,7 @@ public class MotionController : MonoBehaviour {
                         currentLadder.ExitLadderFromTop(transform);
                     }
                 } else if (goingForward < 0) {
-                    if (newPos.y > currentLadder.BaseY) {
+                    if (newPos.y > currentLadder.BaseY + 0.1) {
                         rb.position = newPos;
                     } else {
                         state = States.NORMAL;
@@ -174,6 +179,7 @@ public class MotionController : MonoBehaviour {
 
     public void setStateOnLadder() {
         state = States.ON_LADDER;
+        rb.velocity = Vector3.zero;
     }
     public void setStateNormal() {
         state = States.NORMAL;

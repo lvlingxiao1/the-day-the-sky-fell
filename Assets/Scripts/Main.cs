@@ -54,7 +54,7 @@ public class Main : MonoBehaviour {
         } else {
             yield return new WaitForSeconds(3f);
 
-            player.transform.position = new Vector3(0, 0, -10);
+            player.transform.position = new Vector3(0, -21.75f, -10);
             player.transform.eulerAngles = new Vector3(0, 0, 0);
             livesText.text = $"Lives: {lives}";
             cameraTransform.parent = player.transform;
