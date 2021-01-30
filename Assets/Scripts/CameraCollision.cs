@@ -10,14 +10,18 @@ public class CameraCollision : MonoBehaviour {
     //Text debugText;
     Transform cameraTransform;
     int environmentLayerMask;
+    SkinnedMeshRenderer player_renderer1;
+    SkinnedMeshRenderer player_renderer2;
 
-    void Start() {
+    void Awake() {
         cameraTransform = GameObject.Find("Main Camera").transform;
         cameraRestPosition = cameraTransform.localPosition;
         restDistance = cameraRestPosition.magnitude;
         cameraRestDirection = cameraRestPosition.normalized;
         //debugText = GameObject.Find("debugText").GetComponent<Text>();
         environmentLayerMask = LayerMask.GetMask("environment");
+        player_renderer1 = GameObject.Find("Alpha_Surface").GetComponent<SkinnedMeshRenderer>();
+        player_renderer2 = GameObject.Find("Alpha_Joints").GetComponent<SkinnedMeshRenderer>();
     }
 
     // Update is called once per frame
@@ -27,9 +31,16 @@ public class CameraCollision : MonoBehaviour {
         if (hit) {
             cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, 
                 (hitInfo.distance - 0.3f) * cameraRestDirection, 0.3f);
+            if (hitInfo.distance < 1f) {
+                player_renderer1.enabled = false;
+                player_renderer2.enabled = false;
+                return;
+            }
         } else {
             cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, cameraRestPosition, 0.3f);
         }
+        player_renderer1.enabled = true;
+        player_renderer2.enabled = true;
         //debugText.text = $"{transform.rotation * cameraRestPosition} {transform.position} {restDistance} {hit}";
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Main : MonoBehaviour {
-    public GameObject player;
+    GameObject player;
     public int livesInitial = 2;
     Text scoreText;
     Text livesText;
@@ -14,7 +14,8 @@ public class Main : MonoBehaviour {
     bool respawning;
     AudioManager audioManager;
 
-    void Start() {
+    void Awake() {
+        player = GameObject.Find("Player");
         audioManager = FindObjectOfType<AudioManager>();
         scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
         livesText = GameObject.Find("LivesText").GetComponent<Text>();
@@ -54,11 +55,16 @@ public class Main : MonoBehaviour {
         } else {
             yield return new WaitForSeconds(3f);
 
-            player.transform.position = new Vector3(0, -21.75f, -10);
+            player.transform.position = new Vector3(0, -11.47f, -10);
             player.transform.eulerAngles = new Vector3(0, 0, 0);
+            Animator animator = player.GetComponentInChildren<Animator>();
+            animator.SetBool("climb", false);
+            animator.SetBool("on_ledge", false);
+            player.GetComponent<MotionController>().setStateNormal();
+
             livesText.text = $"Lives: {lives}";
             cameraTransform.parent = player.transform;
-            cameraTransform.localPosition = new Vector3(0, 0, 0);
+            cameraTransform.localPosition = new Vector3(0, 1.3f, 0);
             respawning = false;
             youDiedText.enabled = false;
             Color newColor = youDiedText.color;

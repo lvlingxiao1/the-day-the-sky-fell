@@ -1424,7 +1424,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardSpeed: 10
-  jumpSpeed: 4
+  jumpSpeed: 8
   cameraSpeed: 3
   interactDetectDistance: 1
 --- !u!136 &2272448082369351642

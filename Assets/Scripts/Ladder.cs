@@ -30,9 +30,9 @@ public class Ladder : MonoBehaviour {
     public float BaseY { get { return baseY; } }
     public float TopY { get { return topY; } }
 
-    public void GetOntoLadder(Transform playerTransform, float speed) {
+    public void GetOntoLadder(Transform playerTransform, Transform modelTransform, float speed) {
         this.playerTransform = playerTransform;
-        playerTransform.forward = -transform.forward;
+        modelTransform.forward = -transform.forward;
         startPos = playerTransform.position;
         endPos = entryPos;
         endPos.y = startPos.y + 0.5f;
