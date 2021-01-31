@@ -28,15 +28,15 @@ public class Main : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (lives >= 0 && player.transform.position.y < -100 && !respawning) {
-            respawning = true;
-            youDiedText.enabled = true;
-            StartCoroutine(PlayerDie());
-        } else if (respawning) {
-            Color newColor = youDiedText.color;
-            newColor.a += 0.02f;
-            youDiedText.color = newColor;
-        }
+        //if (lives >= 0 && player.transform.position.y < -100 && !respawning) {
+        //    respawning = true;
+        //    youDiedText.enabled = true;
+        //    StartCoroutine(PlayerDie());
+        //} else if (respawning) {
+        //    Color newColor = youDiedText.color;
+        //    newColor.a += 0.02f;
+        //    youDiedText.color = newColor;
+        //}
     }
 
     public void AddScore() {
