@@ -37,11 +37,13 @@ public class Main : MonoBehaviour {
         //    newColor.a += 0.02f;
         //    youDiedText.color = newColor;
         //}
-    }
-
-    public void AddScore() {
-        score++;
-        scoreText.text = $"Score: {score}";
+        if (player.transform.position.y < -80) {
+            player.transform.position = new Vector3(0, -11.47f, -10);
+            player.transform.eulerAngles = new Vector3(0, 0, 0);
+            MotionController controller = player.GetComponent<MotionController>();
+            controller.SetStateNormal();
+            controller.ResetCamera();
+        }
     }
 
     IEnumerator PlayerDie() {
@@ -60,7 +62,7 @@ public class Main : MonoBehaviour {
             Animator animator = player.GetComponentInChildren<Animator>();
             animator.SetBool("climb", false);
             animator.SetBool("on_ledge", false);
-            player.GetComponent<MotionController>().setStateNormal();
+            player.GetComponent<MotionController>().SetStateNormal();
 
             livesText.text = $"Lives: {lives}";
             cameraTransform.parent = player.transform;

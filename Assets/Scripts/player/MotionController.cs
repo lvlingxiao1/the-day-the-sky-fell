@@ -4,21 +4,22 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MotionController : MonoBehaviour {
-    public float forwardSpeed = 10f;
-    public float jumpSpeed = 4f;
+    public float forwardSpeed = 8f;
+    public float jumpSpeed = 8f;
     public float cameraSpeedX = 180f;
     public float cameraSpeedY = 60f;
     public float interactDetectDistance = 1.0f;
     public float ledgeSpeed = 3f;
+    public bool inputEnabled = true;
 
     // user inputs
     float goingForward;
     float goingRight;
     bool jumpPressed;
+    bool jumpPending = false;
     bool interactBtnDown;
     bool interactBtnHold;
     bool cancelBtnDown;
-    bool inputEnabled = true;
 
     // attributes
     Vector3 cameraRotation;
@@ -36,7 +37,6 @@ public class MotionController : MonoBehaviour {
     Ladder currentLadder;
     Vector3 newVelocity;
     Vector3 cameraForward;
-    Vector3 impulseVelocity;
     Vector3 rootMotionDelta;
     //string interactHint;
     enum InteractType {
@@ -72,7 +72,7 @@ public class MotionController : MonoBehaviour {
         debugText = GameObject.Find("debugText").GetComponent<Text>();
         cameraRotation = cameraTransform.eulerAngles;
         cameraForward = transform.forward;
-        groundDetector = new GroundDetector(new Vector3(0, 0.3f, 0), 0.4f);
+        groundDetector = new GroundDetector(transform);
         interactDetector = new InteractDetector(transform, modelTransform);
         ledgeDetector = new LedgeDetector(transform, modelTransform);
         hangCollider = GameObject.Find("HangCollider").GetComponent<BoxCollider>();
@@ -109,28 +109,25 @@ public class MotionController : MonoBehaviour {
             cameraRotation.x -= Input.GetAxis("Mouse Y") * cameraSpeedY * Time.deltaTime;
             cameraRotation.x = Mathf.Clamp(cameraRotation.x, -40, 70);
             cameraTransform.eulerAngles = cameraRotation;
-            cameraForward.x = cameraTransform.forward.x;
-            cameraForward.z = cameraTransform.forward.z;
-            cameraForward.Normalize();
+            ComputeCameraForward();
         }
 
 
-        grounded = groundDetector.IsOnGround(transform.position);
+        grounded = groundDetector.IsOnGround();
 
         interact = InteractType.None;
         interactHintText.text = "";
         if (state == States.NORMAL) {
+            if (interactDetector.DetectFront(out hitInfo)) {
+                if (hitInfo.collider.CompareTag("ladder")) {
+                    interact = InteractType.Ladder;
+                    interactHintText.text = "Press F to Climb Ladder";
+                }
+            }
             if (grounded) {
-                if (interactDetector.DetectFront(out hitInfo)) {
-                    if (hitInfo.collider.tag == "ladder") {
-                        interact = InteractType.Ladder;
-                        interactHintText.text = "Press F to Climb Ladder";
-                    }
-                } else {
-                    if (interactDetector.DetectLedgeBelow()) {
-                        interact = InteractType.LedgeBelow;
-                        interactHintText.text = "Press F to Climb Ledge Below";
-                    }
+                if (interactDetector.DetectLedgeBelow()) {
+                    interact = InteractType.LedgeBelow;
+                    interactHintText.text = "Press F to Climb Ledge Below";
                 }
             } else {
                 if (interactDetector.DetectLedgeAbove()) {
@@ -142,9 +139,19 @@ public class MotionController : MonoBehaviour {
 
         switch (state) {
             case States.NORMAL:
-                if (jumpPressed && grounded) {
-                    impulseVelocity.y = jumpSpeed;
-                    audioManager.Play("jump");
+                if (grounded) {
+                    if (moveMagnitude > 0.1) {
+                        Vector3 targetDirection = goingForward * cameraForward + goingRight * cameraTransform.right;
+                        modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.3f);
+                        audioManager.PlayIfNotPlaying("walk");
+                    } else {
+                        audioManager.Stop("walk");
+                    }
+
+                    if (jumpPressed) {
+                        jumpPending = true;
+                        audioManager.Play("jump");
+                    }
                 }
 
                 if (interactBtnDown) {
@@ -160,8 +167,7 @@ public class MotionController : MonoBehaviour {
                         grounded = false;
                         animator.SetBool("on_ledge", true);
                         ledgeDetector.EnterLedge();
-                        cameraRotation = modelTransform.eulerAngles + new Vector3(17, 0, 0);
-                        cameraTransform.eulerAngles = cameraRotation;
+                        ResetCamera();
                         state = States.ON_LEDGE;
                     }
                 }
@@ -174,15 +180,6 @@ public class MotionController : MonoBehaviour {
                     }
                 }
 
-                if (grounded) {
-                    if (moveMagnitude > 0.1) {
-                        Vector3 targetDirection = goingForward * cameraForward + goingRight * cameraTransform.right;
-                        modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.3f);
-                        audioManager.PlayIfNotPlaying("walk");
-                    } else {
-                        audioManager.Stop("walk");
-                    }
-                }
 
                 break;
 
@@ -193,11 +190,12 @@ public class MotionController : MonoBehaviour {
                     rb.useGravity = true;
                     animator.SetBool("climb", false);
                 }
-                if (rb.position.y >= currentLadder.TopY - 1.75f) {
+                if (transform.position.y >= currentLadder.TopY - 1.75f) {
+                    transform.position = new Vector3(transform.position.x, currentLadder.TopY - 1.68f, transform.position.z);
                     state = States.LADDER_EXIT;
                     animator.SetTrigger("ladder_top");
                 } else if (grounded) {
-                    setStateNormal();
+                    SetStateNormal();
                 }
                 break;
 
@@ -211,7 +209,7 @@ public class MotionController : MonoBehaviour {
         animator.SetBool("grounded", grounded);
         animator.SetFloat("vertical_speed", rb.velocity.y);
 
-        debugText.text = $"{state}";
+        debugText.text = $"{state} {rb.velocity}";
     }
 
     private void FixedUpdate() {
@@ -221,7 +219,11 @@ public class MotionController : MonoBehaviour {
                 if (grounded) {
                     newVelocity = forwardSpeed * goingForward * cameraForward + forwardSpeed * goingRight * cameraTransform.right;
                     newVelocity.y = rb.velocity.y;
-                    rb.velocity = newVelocity + impulseVelocity;
+                    if (jumpPending) {
+                        newVelocity.y += jumpSpeed;
+                        jumpPending = false;
+                    }
+                    rb.velocity = newVelocity;
                 }
                 break;
             case States.ON_LADDER:
@@ -238,30 +240,42 @@ public class MotionController : MonoBehaviour {
                 rb.velocity = newVelocity;
                 if (grounded) {
                     hangCollider.enabled = false;
-                    setStateNormal();
+                    SetStateNormal();
                     break;
                 }
-                if (goingForward > 0.9) {
+                if (goingForward > 0) {
                     hangCollider.enabled = false;
-                    ledgeDetector.ClimbUp(rb);
-                    setStateNormal();
+                    //ledgeDetector.ClimbUp(rb);
+                    transform.position += modelTransform.forward * ledgeDetector.hangOffsetZ * 2 + new Vector3(0, -ledgeDetector.hangOffsetY, 0);
+                    SetStateNormal();
                 } else if (goingForward < 0) {
                     hangCollider.enabled = false;
-                    setStateNormal();
+                    SetStateNormal();
                 }
 
                 animator.SetFloat("vertical_speed", rb.velocity.y);
                 break;
         }
-        impulseVelocity = Vector3.zero;
         rootMotionDelta = Vector3.zero;
     }
 
-    public void setStateOnLadder() {
+    public void ResetCamera() {
+        cameraRotation = modelTransform.eulerAngles + new Vector3(17, 0, 0);
+        cameraTransform.eulerAngles = cameraRotation;
+        ComputeCameraForward();
+    }
+
+    public void ComputeCameraForward() {
+        cameraForward = cameraTransform.forward;
+        cameraForward.y = 0;
+        cameraForward.Normalize();
+    }
+
+    public void SetStateOnLadder() {
         state = States.ON_LADDER;
         rb.velocity = Vector3.zero;
     }
-    public void setStateNormal() {
+    public void SetStateNormal() {
         state = States.NORMAL;
         rb.useGravity = true;
         rb.velocity = Vector3.zero;
@@ -269,7 +283,7 @@ public class MotionController : MonoBehaviour {
         animator.SetBool("climb", false);
         animator.SetBool("on_ledge", false);
     }
-    public void addRootMotionDelta(Vector3 delta) {
+    public void AddRootMotionDelta(Vector3 delta) {
         if (state == States.NORMAL || state == States.ON_LADDER || state == States.ON_LEDGE) return;
         rootMotionDelta += delta;
     }

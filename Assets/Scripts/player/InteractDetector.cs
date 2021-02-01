@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InteractDetector {
-    Vector3 forwardOffset = new Vector3(0, 0.5f, 0);
-    float forwardDistance = 1f;
+    readonly Vector3 forwardOffset = new Vector3(0, 0.5f, 0);
+    readonly float forwardDistance = 1f;
 
-    Vector3 downOffset = new Vector3(0, 0.3f, 1f);
-    float downDistance = 2f;
+    readonly Vector3 downOffset = new Vector3(0, 0.3f, 1f);
+    readonly float downDistance = 2f;
 
-    Vector3 ledgeAboveOffset = new Vector3(0, 2.5f, 0);
-    float minVerticalOffset = 0.5f;
-    float maxVerticalOffset = 1.5f;
-    float grabDistance = 0.5f;
+    readonly Vector3 ledgeAboveOffset = new Vector3(0, 2.5f, 0);
+    readonly float minVerticalOffset = 0.5f;
+    readonly float maxVerticalOffset = 1.5f;
+    readonly float grabDistance = 0.5f;
 
-    Transform playerTransform;
-    Transform modelTransform;
+    readonly Transform playerTransform;
+    readonly Transform modelTransform;
 
     RaycastHit hitInfo;
     public InteractDetector(Transform playerTransform, Transform modelTransform) {
