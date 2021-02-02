@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MotionController : MonoBehaviour {
-    public float forwardSpeed = 8f;
+    public float forwardSpeed = 5f;
     public float jumpSpeed = 8f;
-    public float cameraSpeedX = 180f;
+    public float cameraSpeedX = 120f;
     public float cameraSpeedY = 60f;
     public float interactDetectDistance = 1.0f;
     public float ledgeSpeed = 3f;
@@ -25,6 +25,7 @@ public class MotionController : MonoBehaviour {
     Vector3 cameraRotation;
     float moveMagnitude;
     bool grounded;
+    bool frontDetected;
     enum States {
         NORMAL,
         LADDER_ENTER,
@@ -114,28 +115,8 @@ public class MotionController : MonoBehaviour {
 
 
         grounded = groundDetector.IsOnGround();
-
-        interact = InteractType.None;
-        interactHintText.text = "";
-        if (state == States.NORMAL) {
-            if (interactDetector.DetectFront(out hitInfo)) {
-                if (hitInfo.collider.CompareTag("ladder")) {
-                    interact = InteractType.Ladder;
-                    interactHintText.text = "Press F to Climb Ladder";
-                }
-            }
-            if (grounded) {
-                if (interactDetector.DetectLedgeBelow()) {
-                    interact = InteractType.LedgeBelow;
-                    interactHintText.text = "Press F to Climb Ledge Below";
-                }
-            } else {
-                if (interactDetector.DetectLedgeAbove()) {
-                    interact = InteractType.LedgeAbove;
-                    interactHintText.text = "Press F to Climb Ledge Above";
-                }
-            }
-        }
+        frontDetected = interactDetector.DetectFront(out hitInfo);
+        FindInteractType();
 
         switch (state) {
             case States.NORMAL:
@@ -190,8 +171,8 @@ public class MotionController : MonoBehaviour {
                     rb.useGravity = true;
                     animator.SetBool("climb", false);
                 }
-                if (transform.position.y >= currentLadder.TopY - 1.75f) {
-                    transform.position = new Vector3(transform.position.x, currentLadder.TopY - 1.68f, transform.position.z);
+                if (transform.position.y >= currentLadder.TopY - 1.70f) {
+                    transform.position = new Vector3(transform.position.x, currentLadder.TopY - 1.65f, transform.position.z);
                     state = States.LADDER_EXIT;
                     animator.SetTrigger("ladder_top");
                 } else if (grounded) {
@@ -228,7 +209,7 @@ public class MotionController : MonoBehaviour {
                 break;
             case States.ON_LADDER:
                 Vector3 newPos = rb.position + 2.0f * goingForward * Vector3.up * Time.fixedDeltaTime;
-                if (newPos.y < currentLadder.TopY - 1.7f) {
+                if (newPos.y < currentLadder.TopY - 1.65f) {
                     rb.position = newPos;
                 }
                 break;
@@ -245,7 +226,6 @@ public class MotionController : MonoBehaviour {
                 }
                 if (goingForward > 0) {
                     hangCollider.enabled = false;
-                    //ledgeDetector.ClimbUp(rb);
                     transform.position += modelTransform.forward * ledgeDetector.hangOffsetZ * 2 + new Vector3(0, -ledgeDetector.hangOffsetY, 0);
                     SetStateNormal();
                 } else if (goingForward < 0) {
@@ -269,6 +249,33 @@ public class MotionController : MonoBehaviour {
         cameraForward = cameraTransform.forward;
         cameraForward.y = 0;
         cameraForward.Normalize();
+    }
+
+    void FindInteractType() {
+        interact = InteractType.None;
+        interactHintText.text = "";
+        if (state == States.NORMAL) {
+            if (frontDetected) {
+                if (hitInfo.collider.CompareTag("ladder")) {
+                    interact = InteractType.Ladder;
+                    interactHintText.text = "Press F to Climb Ladder";
+                    return;
+                }
+            }
+            if (grounded) {
+                if (!frontDetected) {
+                    if (interactDetector.DetectLedgeBelow()) {
+                        interact = InteractType.LedgeBelow;
+                        interactHintText.text = "Press F to Climb Ledge Below";
+                    }
+                }
+            } else {    // not on ground
+                if (interactDetector.DetectLedgeAbove()) {
+                    interact = InteractType.LedgeAbove;
+                    interactHintText.text = "Press F to Climb Ledge Above";
+                }
+            }
+        }
     }
 
     public void SetStateOnLadder() {
