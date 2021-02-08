@@ -12,15 +12,19 @@ public class InteractDetector {
     readonly Vector3 ledgeAboveOffset = new Vector3(0, 2.5f, 0);
     readonly float minVerticalOffset = 0.5f;
     readonly float maxVerticalOffset = 1.5f;
+    readonly Vector3 grabDetectBoxHalfSize = new Vector3(0.4f, 0.75f, 0.25f);
     readonly float grabDistance = 0.5f;
 
     readonly Transform playerTransform;
     readonly Transform modelTransform;
 
+    readonly int environment;
+
     RaycastHit hitInfo;
     public InteractDetector(Transform playerTransform, Transform modelTransform) {
         this.playerTransform = playerTransform;
         this.modelTransform = modelTransform;
+        environment = LayerMask.GetMask("environment");
     }
     public bool DetectFront(out RaycastHit hit) {
         Debug.DrawRay(playerTransform.position + forwardOffset, modelTransform.forward * forwardDistance, new Color(0, 1, 0));
@@ -44,12 +48,18 @@ public class InteractDetector {
         Debug.DrawRay(checkDownwardOrigin, Vector3.down * maxVerticalOffset, new Color(0, 1, 0));
         Debug.DrawRay(checkDownwardOrigin, Vector3.down * minVerticalOffset, new Color(1, 0, 0));
         if (!Physics.Raycast(playerTransform.position + ledgeAboveOffset, modelTransform.forward, grabDistance)) {
-            if (Physics.Raycast(checkDownwardOrigin, Vector3.down, out hitInfo, maxVerticalOffset)) {
-                if (hitInfo.distance >= minVerticalOffset) {
-                    return true;
-                }
+            //if (Physics.Raycast(checkDownwardOrigin, Vector3.down, out hitInfo, maxVerticalOffset)) {
+            //    if (hitInfo.distance >= minVerticalOffset) {
+            //        return true;
+            //    }
+            //}
+            if (Physics.BoxCast(checkDownwardOrigin, grabDetectBoxHalfSize, Vector3.down, modelTransform.rotation, 1.5f, environment)) {
+                return true;
             }
         }
+
+
+
         return false;
     }
 }
