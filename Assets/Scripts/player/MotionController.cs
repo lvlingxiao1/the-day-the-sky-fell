@@ -190,7 +190,7 @@ public class MotionController : MonoBehaviour {
                     break;
                 }
                 ledgeDetector.AdjustFacingToLedge();
-                if (interactBtnDown) {
+                if (grabBtnDown) {
                     transform.position += modelTransform.forward * ledgeDetector.hangOffsetZ * 2 + new Vector3(0, -ledgeDetector.hangOffsetY, 0);
                     SetStateNormal();
                 } else if (goingForward < 0) {
@@ -294,7 +294,7 @@ public class MotionController : MonoBehaviour {
                 //}
             }
         } else if (state == States.GRAB_STABLE) {
-            interactHintText.text = "Press F to Climb Up";
+            interactHintText.text = "Press Q to Climb Up";
         }
     }
 
