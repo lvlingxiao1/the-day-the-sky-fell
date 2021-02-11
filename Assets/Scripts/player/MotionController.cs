@@ -137,6 +137,14 @@ public class MotionController : MonoBehaviour {
                         jumpPending = true;
                         audioManager.Play("jump");
                     }
+                } else {
+                    if (grabBtnDown) {
+                        animator.SetBool("on_ledge", true);
+                        hangCollider.enabled = true;
+                        grabArmCollider.enabled = true;
+                        grabStuckSecondChance = 1;  // velocity becomes 0 once when jumping up 
+                        state = States.GRAB;
+                    }
                 }
 
                 if (interactBtnDown) {
@@ -156,14 +164,6 @@ public class MotionController : MonoBehaviour {
                         ResetCamera();
                         state = States.GRAB;
                     }
-                }
-
-                if (grabBtnDown) {
-                    animator.SetBool("on_ledge", true);
-                    hangCollider.enabled = true;
-                    grabArmCollider.enabled = true;
-                    grabStuckSecondChance = 1;  // velocity becomes 0 once when jumping up 
-                    state = States.GRAB;
                 }
 
                 break;
