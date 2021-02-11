@@ -56,14 +56,14 @@ public class Ladder : MonoBehaviour {
             playerTransform.position = Vector3.Lerp(startPos, endPos, progress / lerpTime);
             if (progress >= lerpTime) {
                 entering = false;
-                playerTransform.GetComponentInParent<MotionController>().setStateOnLadder();
+                playerTransform.GetComponentInParent<MotionController>().SetStateOnLadder();
             }
         } else if (exiting) {
             progress += Time.deltaTime;
             playerTransform.position = Vector3.Lerp(startPos, endPos, progress / lerpTime);
             if (progress >= lerpTime) {
                 exiting = false;
-                playerTransform.GetComponentInParent<MotionController>().setStateNormal();
+                playerTransform.GetComponentInParent<MotionController>().SetStateNormal();
             }
         }
     }

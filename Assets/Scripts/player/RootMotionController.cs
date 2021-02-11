@@ -11,6 +11,6 @@ public class RootMotionController : MonoBehaviour {
         animator = GetComponent<Animator>();
     }
     private void OnAnimatorMove() {
-        controller.addRootMotionDelta(animator.deltaPosition);
+        controller.AddRootMotionDelta(animator.deltaPosition);
     }
 }

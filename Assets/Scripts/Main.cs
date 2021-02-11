@@ -28,20 +28,22 @@ public class Main : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (lives >= 0 && player.transform.position.y < -100 && !respawning) {
-            respawning = true;
-            youDiedText.enabled = true;
-            StartCoroutine(PlayerDie());
-        } else if (respawning) {
-            Color newColor = youDiedText.color;
-            newColor.a += 0.02f;
-            youDiedText.color = newColor;
+        //if (lives >= 0 && player.transform.position.y < -100 && !respawning) {
+        //    respawning = true;
+        //    youDiedText.enabled = true;
+        //    StartCoroutine(PlayerDie());
+        //} else if (respawning) {
+        //    Color newColor = youDiedText.color;
+        //    newColor.a += 0.02f;
+        //    youDiedText.color = newColor;
+        //}
+        if (player.transform.position.y < -80) {
+            player.transform.position = new Vector3(0, -11.47f, -10);
+            player.transform.eulerAngles = new Vector3(0, 0, 0);
+            MotionController controller = player.GetComponent<MotionController>();
+            controller.SetStateNormal();
+            controller.ResetCamera();
         }
-    }
-
-    public void AddScore() {
-        score++;
-        scoreText.text = $"Score: {score}";
     }
 
     IEnumerator PlayerDie() {
@@ -60,7 +62,7 @@ public class Main : MonoBehaviour {
             Animator animator = player.GetComponentInChildren<Animator>();
             animator.SetBool("climb", false);
             animator.SetBool("on_ledge", false);
-            player.GetComponent<MotionController>().setStateNormal();
+            player.GetComponent<MotionController>().SetStateNormal();
 
             livesText.text = $"Lives: {lives}";
             cameraTransform.parent = player.transform;
