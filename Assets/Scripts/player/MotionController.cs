@@ -155,7 +155,6 @@ public class MotionController : MonoBehaviour {
                         currentLadder.GetOntoLadder(transform, modelTransform, forwardSpeed);
                         state = States.LADDER_ENTER;
                     } else if (interact == InteractType.LedgeBelow) {
-                        //rb.useGravity = false;
                         hangCollider.enabled = true;
                         grabArmCollider.enabled = true;
                         grounded = false;
@@ -190,7 +189,7 @@ public class MotionController : MonoBehaviour {
                     break;
                 }
                 ledgeDetector.AdjustFacingToLedge();
-                if (grabBtnDown) {
+                if (grabBtnDown) {  // teleport up
                     transform.position += modelTransform.forward * ledgeDetector.hangOffsetZ * 2 + new Vector3(0, -ledgeDetector.hangOffsetY, 0);
                     SetStateNormal();
                 } else if (goingForward < 0) {

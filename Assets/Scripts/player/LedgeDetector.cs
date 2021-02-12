@@ -10,8 +10,8 @@ public class LedgeDetector {
     readonly Transform modelTransform;
     readonly Text debugText;
     public readonly float hangOffsetY = -2.224f;
-    public readonly float hangOffsetZ = 0.17f;
-    readonly Vector3 adjustFacingPoint1 = new Vector3(0, 2f, -0.1f);
+    public readonly float hangOffsetZ;
+    readonly Vector3 adjustFacingPoint1 = new Vector3(0f, 2f, -0.1f);
     readonly Vector3 adjustFacingPoint2 = new Vector3(-0.4f, 2.2f, -0.1f);
     readonly Vector3 adjustFacingPoint3 = new Vector3(0.4f, 2.2f, -0.1f);
     readonly float adjustDetectDistance = 0.5f;
@@ -33,23 +33,22 @@ public class LedgeDetector {
         Vector3 newForward = -hitInfo.normal;
         newForward.y = 0;
         newForward.Normalize();
-
         playerTransform.position = newPos;
         modelTransform.forward = newForward;
     }
 
     public bool AdjustFacingToLedge() {
-        Debug.DrawRay(playerTransform.position + adjustFacingPoint1, modelTransform.forward * adjustDetectDistance, new Color(0, 1, 0));
+        Debug.DrawRay(playerTransform.position + modelTransform.rotation * adjustFacingPoint1, modelTransform.forward * adjustDetectDistance, new Color(0, 1, 0));
         Debug.DrawRay(playerTransform.position + modelTransform.rotation * adjustFacingPoint2, modelTransform.forward * adjustDetectDistance, new Color(0, 1, 0));
         Debug.DrawRay(playerTransform.position + modelTransform.rotation * adjustFacingPoint3, modelTransform.forward * adjustDetectDistance, new Color(0, 1, 0));
         Vector3 horizontalOffset = Vector3.zero;
-        if (!Physics.Raycast(playerTransform.position + adjustFacingPoint1, modelTransform.forward, out hitInfo, adjustDetectDistance, environment)) {
+        if (!Physics.Raycast(playerTransform.position + modelTransform.rotation * adjustFacingPoint1, modelTransform.forward, out hitInfo, adjustDetectDistance, environment)) {
             if (!Physics.Raycast(playerTransform.position + modelTransform.rotation * adjustFacingPoint2, modelTransform.forward, out hitInfo, adjustDetectDistance, environment)) {
                 if (!Physics.Raycast(playerTransform.position + modelTransform.rotation * adjustFacingPoint3, modelTransform.forward, out hitInfo, adjustDetectDistance, environment)) return false;
-                else horizontalOffset = modelTransform.rotation * new Vector3(-0.4f, 0, 0.1f);
-            } else horizontalOffset = modelTransform.rotation * new Vector3(0.4f, 0, 0.1f);
+                else horizontalOffset = modelTransform.rotation * Vector3.right * -0.4f;
+            } else horizontalOffset = modelTransform.rotation * Vector3.right * 0.4f;
         }
-        Vector3 newPos = hitInfo.point + hitInfo.normal * (hangOffsetZ + 0.1f) + horizontalOffset;
+        Vector3 newPos = hitInfo.point + hitInfo.normal * hangOffsetZ + horizontalOffset;
         newPos.y = playerTransform.position.y;
         Vector3 newForward = -hitInfo.normal;
         newForward.y = 0;
