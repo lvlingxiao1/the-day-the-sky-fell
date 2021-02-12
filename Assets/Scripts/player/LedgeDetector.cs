@@ -27,7 +27,9 @@ public class LedgeDetector {
     public void EnterLedge() {
         bool hit = Physics.Raycast(playerTransform.position + modelTransform.rotation * entryDetectOrigin,
             modelTransform.rotation * Vector3.back, out RaycastHit hitInfo, 1f, environment);
-        if (!hit) return;
+        if (!hit) {
+            Debug.Log("Cannot climb the ledge below"); return;
+        }
         Vector3 newPos = hitInfo.point + hitInfo.normal * hangOffsetZ;
         newPos.y = playerTransform.position.y + hangOffsetY;
         Vector3 newForward = -hitInfo.normal;
