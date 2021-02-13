@@ -226,6 +226,12 @@ public class MotionController : MonoBehaviour {
                     return;
                 }
             }
+            if (frontDetected) {
+                if (hitInfo.collider.CompareTag("DialogueTrigger")) {
+                    interactHintText.text = "Press F to Interact";
+                    return;
+                }
+            }
             if (grounded) {
                 if (!frontDetected) {
                     if (interactDetector.DetectLedgeBelow()) {
