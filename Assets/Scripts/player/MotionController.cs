@@ -6,24 +6,13 @@ using UnityEngine.UI;
 public class MotionController : MonoBehaviour {
     public float forwardSpeed = 5f;
     public float jumpSpeed = 8f;
-    public float cameraSpeedX = 120f;
-    public float cameraSpeedY = 60f;
     public float interactDetectDistance = 1.0f;
     public float ledgeSpeed = 3f;
-    public bool inputEnabled = true;
 
     // user inputs
-    float goingForward;
-    float goingRight;
-    bool jumpPressed;
     bool jumpPending = false;
-    bool interactBtnDown;
-    bool grabBtnDown;
-    bool cancelBtnDown;
 
     // attributes
-    Vector3 cameraRotation;
-    float moveMagnitude;
     bool grounded;
     bool frontDetected;
     int grabStuckSecondChance;
@@ -39,9 +28,7 @@ public class MotionController : MonoBehaviour {
     States state = States.NORMAL;
     Ladder currentLadder;
     Vector3 newVelocity;
-    Vector3 cameraForward;
     Vector3 rootMotionDelta;
-    //string interactHint;
     enum InteractType {
         None,
         Ladder,
@@ -53,7 +40,6 @@ public class MotionController : MonoBehaviour {
 
     // components
     Rigidbody rb;
-    Transform cameraTransform;
     Animator animator;
     AudioManager audioManager;
     Text debugText;
@@ -65,59 +51,32 @@ public class MotionController : MonoBehaviour {
     BoxCollider grabArmCollider;
     CapsuleCollider mainCollider;
     Text interactHintText;
+    PlayerInput input;
+    new CameraController camera;
 
 
     void Awake() {
+        input = FindObjectOfType<PlayerInput>();
+        camera = FindObjectOfType<CameraController>();
+        audioManager = FindObjectOfType<AudioManager>();
+
         rb = GetComponent<Rigidbody>();
-        cameraTransform = GameObject.Find("CameraTransform").transform;
+        mainCollider = GetComponent<CapsuleCollider>();
+
         modelTransform = GameObject.Find("PlayerModel").transform;
         animator = modelTransform.GetComponent<Animator>();
-        audioManager = FindObjectOfType<AudioManager>();
+
         debugText = GameObject.Find("debugText").GetComponent<Text>();
-        cameraRotation = cameraTransform.eulerAngles;
-        cameraForward = transform.forward;
+        hangCollider = GameObject.Find("HangCollider").GetComponent<BoxCollider>();
+        grabArmCollider = GameObject.Find("GrabArmCollider").GetComponent<BoxCollider>();
+        interactHintText = GameObject.Find("InteractHint").GetComponent<Text>();
+
         groundDetector = new GroundDetector(transform);
         interactDetector = new InteractDetector(transform, modelTransform);
         ledgeDetector = new LedgeDetector(transform, modelTransform);
-        hangCollider = GameObject.Find("HangCollider").GetComponent<BoxCollider>();
-        grabArmCollider = GameObject.Find("GrabArmCollider").GetComponent<BoxCollider>();
-        mainCollider = GetComponent<CapsuleCollider>();
-        interactHintText = GameObject.Find("InteractHint").GetComponent<Text>();
     }
 
     void Update() {
-        float verticleInput = Input.GetAxis("Vertical");
-        float horizontalInput = Input.GetAxis("Horizontal");
-        if (inputEnabled) {
-            jumpPressed = Input.GetButtonDown("Jump");
-            interactBtnDown = Input.GetButtonDown("Interact");
-            cancelBtnDown = Input.GetButtonDown("Cancel");
-            grabBtnDown = Input.GetButtonDown("Grab");
-
-            // elliptical grid mapping: https://arxiv.org/ftp/arxiv/papers/1509/1509.06344.pdf
-            goingForward = verticleInput * Mathf.Sqrt(1 - horizontalInput * horizontalInput * 0.5f);
-            goingRight = horizontalInput * Mathf.Sqrt(1 - verticleInput * verticleInput * 0.5f);
-            moveMagnitude = Mathf.Sqrt(goingForward * goingForward + goingRight * goingRight);
-        } else {
-            jumpPressed = false;
-            interactBtnDown = false;
-            cancelBtnDown = false;
-            goingForward = 0;
-            goingRight = 0;
-            moveMagnitude = 0;
-        }
-
-
-        // camera control
-        if (Input.GetMouseButton(0)) {
-            cameraRotation.y += Input.GetAxis("Mouse X") * cameraSpeedX * Time.deltaTime;
-            cameraRotation.x -= Input.GetAxis("Mouse Y") * cameraSpeedY * Time.deltaTime;
-            cameraRotation.x = Mathf.Clamp(cameraRotation.x, -40, 70);
-            cameraTransform.eulerAngles = cameraRotation;
-            ComputeCameraForward();
-        }
-
-
         grounded = groundDetector.IsOnGround();
         frontDetected = interactDetector.DetectFront(out hitInfo);
         FindInteractType();
@@ -125,20 +84,20 @@ public class MotionController : MonoBehaviour {
         switch (state) {
             case States.NORMAL:
                 if (grounded) {
-                    if (moveMagnitude > 0.1) {
-                        Vector3 targetDirection = goingForward * cameraForward + goingRight * cameraTransform.right;
+                    if (input.moveMagnitude > 0.1) {
+                        Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
                         modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.4f);
                         audioManager.PlayIfNotPlaying("walk");
                     } else {
                         audioManager.Stop("walk");
                     }
 
-                    if (jumpPressed) {
+                    if (input.jumpPressed) {
                         jumpPending = true;
                         audioManager.Play("jump");
                     }
                 } else {
-                    if (grabBtnDown) {
+                    if (input.grabBtnDown) {
                         animator.SetBool("on_ledge", true);
                         hangCollider.enabled = true;
                         grabArmCollider.enabled = true;
@@ -147,7 +106,7 @@ public class MotionController : MonoBehaviour {
                     }
                 }
 
-                if (interactBtnDown) {
+                if (input.interactBtnDown) {
                     if (interact == InteractType.Ladder) {
                         rb.useGravity = false;
                         animator.SetBool("climb", true);
@@ -160,7 +119,7 @@ public class MotionController : MonoBehaviour {
                         grounded = false;
                         animator.SetBool("on_ledge", true);
                         ledgeDetector.EnterLedge();
-                        ResetCamera();
+                        camera.ResetCamera(modelTransform.eulerAngles);
                         state = States.GRAB;
                     }
                 }
@@ -169,7 +128,7 @@ public class MotionController : MonoBehaviour {
 
 
             case States.ON_LADDER:
-                if (cancelBtnDown || interactBtnDown) {
+                if (input.cancelBtnDown || input.interactBtnDown) {
                     state = States.NORMAL;
                     rb.useGravity = true;
                     animator.SetBool("climb", false);
@@ -189,17 +148,17 @@ public class MotionController : MonoBehaviour {
                     break;
                 }
                 ledgeDetector.AdjustFacingToLedge();
-                if (grabBtnDown) {  // teleport up
+                if (input.grabBtnDown) {  // teleport up
                     transform.position += modelTransform.forward * ledgeDetector.hangOffsetZ * 2 + new Vector3(0, -ledgeDetector.hangOffsetY, 0);
                     SetStateNormal();
-                } else if (goingForward < 0) {
+                } else if (input.goingForward < 0) {
                     SetStateNormal();
                 }
                 break;
         }
 
 
-        animator.SetFloat("forward", moveMagnitude);
+        animator.SetFloat("forward", input.moveMagnitude);
         animator.SetBool("grounded", grounded);
         animator.SetFloat("vertical_speed", rb.velocity.y);
 
@@ -211,7 +170,7 @@ public class MotionController : MonoBehaviour {
         switch (state) {
             case States.NORMAL:
                 if (grounded) {
-                    newVelocity = forwardSpeed * goingForward * cameraForward + forwardSpeed * goingRight * cameraTransform.right;
+                    newVelocity = forwardSpeed * input.goingForward * camera.forward + forwardSpeed * input.goingRight * camera.right;
                     newVelocity.y = rb.velocity.y;
                     if (jumpPending) {
                         newVelocity.y += jumpSpeed;
@@ -221,7 +180,7 @@ public class MotionController : MonoBehaviour {
                 }
                 break;
             case States.ON_LADDER:
-                Vector3 newPos = rb.position + 2.0f * goingForward * Vector3.up * Time.fixedDeltaTime;
+                Vector3 newPos = rb.position + 2.0f * input.goingForward * Vector3.up * Time.fixedDeltaTime;
                 if (newPos.y < currentLadder.TopY - 1.65f) {
                     rb.position = newPos;
                 }
@@ -242,7 +201,7 @@ public class MotionController : MonoBehaviour {
                 break;
 
             case States.GRAB_STABLE:
-                newVelocity = ledgeSpeed * goingRight * modelTransform.right;
+                newVelocity = ledgeSpeed * input.goingRight * modelTransform.right;
                 newVelocity.y = rb.velocity.y;
                 rb.velocity = newVelocity;
                 if (grounded) {
@@ -254,18 +213,6 @@ public class MotionController : MonoBehaviour {
                 break;
         }
         rootMotionDelta = Vector3.zero;
-    }
-
-    public void ResetCamera() {
-        cameraRotation = modelTransform.eulerAngles + new Vector3(17, 0, 0);
-        cameraTransform.eulerAngles = cameraRotation;
-        ComputeCameraForward();
-    }
-
-    public void ComputeCameraForward() {
-        cameraForward = cameraTransform.forward;
-        cameraForward.y = 0;
-        cameraForward.Normalize();
     }
 
     void FindInteractType() {
@@ -293,7 +240,7 @@ public class MotionController : MonoBehaviour {
                 //}
             }
         } else if (state == States.GRAB_STABLE) {
-            interactHintText.text = "Press Q to Climb Up";
+            interactHintText.text = "Press R to Climb Up";
         }
     }
 

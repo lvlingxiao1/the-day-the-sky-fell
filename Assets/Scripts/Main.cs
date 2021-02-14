@@ -42,7 +42,7 @@ public class Main : MonoBehaviour {
             player.transform.eulerAngles = new Vector3(0, 0, 0);
             MotionController controller = player.GetComponent<MotionController>();
             controller.SetStateNormal();
-            controller.ResetCamera();
+            //controller.ResetCamera();
         }
     }
 
