@@ -4233,6 +4233,28 @@ Transform:
   m_Father: {fileID: 2090530053}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1717726113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717726108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2c64c7ce42cf9b4c8be628f0e1a5e49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogue:
+    name: Player
+    sentences:
+    - Hey its a dog, I should pet it.
+    - It's very fluffy!
+    - Now im sad because I have to go.
+    sprites:
+    - {fileID: 21300000, guid: 7a2a228ec0c9277408cfe141b40d4af1, type: 3}
+    - {fileID: 21300000, guid: e09b68dea190210438d1c3584bbd6200, type: 3}
+    - {fileID: 21300000, guid: 139acb465f3dace4e90ac052ea441538, type: 3}
 --- !u!1 &1746396435
 GameObject:
   m_ObjectHideFlags: 0
