@@ -7,13 +7,16 @@ public class DialogueManager : MonoBehaviour
 {
     public Text nameText;
     public Text dialogueText;
+    public Image speakerSprite;
     public Animator animator;
     private Queue<string> sentences;
+    private Queue<Sprite> sprites;
 
     // Start is called before the first frame update
     void Start()
     {
         sentences = new Queue<string>();
+        sprites = new Queue<Sprite>();
     }
 
     public void StartDialogue(Dialogue dialogue)
@@ -25,10 +28,15 @@ public class DialogueManager : MonoBehaviour
         nameText.text = dialogue.name;
 
         sentences.Clear();
+        sprites.Clear();
 
         foreach (string sentence in dialogue.sentences)
         {
             sentences.Enqueue(sentence);
+        }
+        foreach (Sprite sprite in dialogue.sprites)
+        {
+            sprites.Enqueue(sprite);
         }
 
         DisplayNextSentence();
@@ -43,8 +51,10 @@ public class DialogueManager : MonoBehaviour
         }
 
         string sentence = sentences.Dequeue();
+        Sprite sprite = sprites.Dequeue();
         StopAllCoroutines();
         StartCoroutine(TypeSentence(sentence));
+        speakerSprite.sprite = sprite;
         Debug.Log(sentence);
     }
 
