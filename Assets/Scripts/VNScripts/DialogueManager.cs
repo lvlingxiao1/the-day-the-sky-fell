@@ -21,7 +21,7 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(Dialogue dialogue)
     {
-
+        GameObject.Find("Main").GetComponent<PlayerInput>().inputEnabled = false;
         animator.SetBool("isOpen", true);
         Debug.Log("starting dialogue with " + dialogue.name);
 
@@ -70,6 +70,7 @@ public class DialogueManager : MonoBehaviour
 
     void EndDialogue()
     {
+        GameObject.Find("Main").GetComponent<PlayerInput>().inputEnabled = true;
         Debug.Log("End of conversation.");
         animator.SetBool("isOpen", false);
     }
