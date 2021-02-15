@@ -10,16 +10,12 @@ public class DialogueManager : MonoBehaviour
     public Image speakerSprite;
     public Animator animator;
     private PlayerInput input;
-    private Queue<string> names;
-    private Queue<string> sentences;
-    private Queue<Sprite> sprites;
+    private Sentence[] sentences;
+    private int index;
 
     // Start is called before the first frame update
     void Start()
     {
-        names = new Queue<string>();
-        sentences = new Queue<string>();
-        sprites = new Queue<Sprite>();
         input = FindObjectOfType<PlayerInput>();
     }
 
@@ -28,35 +24,25 @@ public class DialogueManager : MonoBehaviour
         input.inputEnabled = false;
         animator.SetBool("isOpen", true);
 
-        names.Clear();
-        sentences.Clear();
-        sprites.Clear();
-
-        foreach (Sentence sentence in dialogue.sentences)
-        {
-            names.Enqueue(sentence.name);
-            sentences.Enqueue(sentence.content);
-            sprites.Enqueue(sentence.sprite);
-        }
+        index = 0;
+        sentences = dialogue.sentences;
 
         DisplayNextSentence();
     }
 
     public void DisplayNextSentence()
     {
-        if (sentences.Count == 0)
+        if (index >= sentences.Length)
         {
             EndDialogue();
             return;
         }
 
-        string name = names.Dequeue();
-        string sentence = sentences.Dequeue();
-        Sprite sprite = sprites.Dequeue();
         StopAllCoroutines();
-        StartCoroutine(TypeSentence(sentence));
-        nameText.text = name;
-        speakerSprite.sprite = sprite;
+        StartCoroutine(TypeSentence(sentences[index].content));
+        nameText.text = sentences[index].name;
+        speakerSprite.sprite = sentences[index].sprite;
+        index++;
     }
 
     IEnumerator TypeSentence (string sentence)
