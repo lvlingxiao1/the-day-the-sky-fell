@@ -28,20 +28,15 @@ public class DialogueManager : MonoBehaviour
         input.inputEnabled = false;
         animator.SetBool("isOpen", true);
 
+        names.Clear();
         sentences.Clear();
         sprites.Clear();
 
-        foreach (string name in dialogue.names)
+        foreach (Sentence sentence in dialogue.sentences)
         {
-            names.Enqueue(name);
-        }
-        foreach (string sentence in dialogue.sentences)
-        {
-            sentences.Enqueue(sentence);
-        }
-        foreach (Sprite sprite in dialogue.sprites)
-        {
-            sprites.Enqueue(sprite);
+            names.Enqueue(sentence.name);
+            sentences.Enqueue(sentence.content);
+            sprites.Enqueue(sentence.sprite);
         }
 
         DisplayNextSentence();

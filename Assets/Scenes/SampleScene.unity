@@ -4076,18 +4076,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogue:
-    names:
-    - Player
-    - Player
-    - Player
     sentences:
-    - Hey its a dog, I should pet it.
-    - It's very fluffy!
-    - Now im sad because I have to go.
-    sprites:
-    - {fileID: 21300000, guid: 7a2a228ec0c9277408cfe141b40d4af1, type: 3}
-    - {fileID: 21300000, guid: e09b68dea190210438d1c3584bbd6200, type: 3}
-    - {fileID: 21300000, guid: 139acb465f3dace4e90ac052ea441538, type: 3}
+    - name: Player
+      content: Hey its a dog. I should pet it.
+      sprite: {fileID: 21300000, guid: 7a2a228ec0c9277408cfe141b40d4af1, type: 3}
+    - name: Player
+      content: It's very fluffy!
+      sprite: {fileID: 21300000, guid: e09b68dea190210438d1c3584bbd6200, type: 3}
+    - name: Player
+      content: Now I'm sad because I have to leave.
+      sprite: {fileID: 21300000, guid: 139acb465f3dace4e90ac052ea441538, type: 3}
 --- !u!1 &1719005809
 GameObject:
   m_ObjectHideFlags: 0
