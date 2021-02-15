@@ -9,27 +9,32 @@ public class DialogueManager : MonoBehaviour
     public Text dialogueText;
     public Image speakerSprite;
     public Animator animator;
+    private PlayerInput input;
+    private Queue<string> names;
     private Queue<string> sentences;
     private Queue<Sprite> sprites;
 
     // Start is called before the first frame update
     void Start()
     {
+        names = new Queue<string>();
         sentences = new Queue<string>();
         sprites = new Queue<Sprite>();
+        input = FindObjectOfType<PlayerInput>();
     }
 
     public void StartDialogue(Dialogue dialogue)
     {
-        GameObject.Find("Main").GetComponent<PlayerInput>().inputEnabled = false;
+        input.inputEnabled = false;
         animator.SetBool("isOpen", true);
-        Debug.Log("starting dialogue with " + dialogue.name);
-
-        nameText.text = dialogue.name;
 
         sentences.Clear();
         sprites.Clear();
 
+        foreach (string name in dialogue.names)
+        {
+            names.Enqueue(name);
+        }
         foreach (string sentence in dialogue.sentences)
         {
             sentences.Enqueue(sentence);
@@ -50,12 +55,13 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
+        string name = names.Dequeue();
         string sentence = sentences.Dequeue();
         Sprite sprite = sprites.Dequeue();
         StopAllCoroutines();
         StartCoroutine(TypeSentence(sentence));
+        nameText.text = name;
         speakerSprite.sprite = sprite;
-        Debug.Log(sentence);
     }
 
     IEnumerator TypeSentence (string sentence)
@@ -70,8 +76,7 @@ public class DialogueManager : MonoBehaviour
 
     void EndDialogue()
     {
-        GameObject.Find("Main").GetComponent<PlayerInput>().inputEnabled = true;
-        Debug.Log("End of conversation.");
         animator.SetBool("isOpen", false);
+        input.inputEnabled = true;
     }
 }
