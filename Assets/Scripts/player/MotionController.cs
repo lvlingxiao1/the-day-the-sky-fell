@@ -33,7 +33,8 @@ public class MotionController : MonoBehaviour {
         None,
         Ladder,
         LedgeBelow,
-        LedgeAbove
+        LedgeAbove,
+        Dialogue
     }
     InteractType interact;
     RaycastHit hitInfo;
@@ -121,6 +122,10 @@ public class MotionController : MonoBehaviour {
                         ledgeDetector.EnterLedge();
                         camera.ResetCamera(modelTransform.eulerAngles);
                         state = States.GRAB;
+                    } else if (interact == InteractType.Dialogue) {
+                        // trigger dialogue
+                        DialogueTrigger trigger = hitInfo.collider.GetComponentInParent<DialogueTrigger>();
+                        trigger.TriggerDialogue();
                     }
                 }
 
@@ -223,6 +228,11 @@ public class MotionController : MonoBehaviour {
                 if (hitInfo.collider.CompareTag("ladder")) {
                     interact = InteractType.Ladder;
                     interactHintText.text = "Press F to Climb Ladder";
+                    return;
+                }
+                else if (hitInfo.collider.CompareTag("DialogueTrigger")) {
+                    interact = InteractType.Dialogue;
+                    interactHintText.text = "Press F to Talk";
                     return;
                 }
             }
