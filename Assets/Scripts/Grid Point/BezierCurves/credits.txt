@@ -1,0 +1,3 @@
+[Bezier Cruves Editor]
+Original author: Athos Kele
+Website: https://github.com/sharpaccent/Behavior-Editor

@@ -98,6 +98,7 @@ public class MotionController : MonoBehaviour {
                         audioManager.Play("jump");
                     }
                 } else {
+                    audioManager.Stop("walk");
                     if (input.grabBtnDown) {
                         animator.SetBool("on_ledge", true);
                         hangCollider.enabled = true;
@@ -271,5 +272,19 @@ public class MotionController : MonoBehaviour {
     public void AddRootMotionDelta(Vector3 delta) {
         if (state == States.NORMAL || state == States.ON_LADDER || state == States.GRAB) return;
         rootMotionDelta += delta;
+    }
+
+    public void EnableMotionController()
+    {
+        input.inputEnabled = true;
+        rb.isKinematic = false;
+        GetComponent<Collider>().isTrigger = false;
+    }
+
+    public void DisableMotionController()
+    {
+        input.inputEnabled = false;
+        rb.isKinematic = true;
+        GetComponent<Collider>().isTrigger = true;
     }
 }
