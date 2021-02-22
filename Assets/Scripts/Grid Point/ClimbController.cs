@@ -939,7 +939,7 @@ namespace Climbing
 
         void InitIK(Vector3 moveDirection, bool isOnPoint)
         {
-            Vector3 localDirection = transform.InverseTransformDirection(moveDirection);
+            Vector3 localDirection = moveDirection;
 
             if (Mathf.Abs(localDirection.y) > 0.5f)
             {
