@@ -19,6 +19,7 @@ namespace Climbing
 
         [Header("Helper Utilities")]
         public bool deleteAll;
+        public bool updatePointList;
         public bool createIndicators;
         public float pointGap = 0.5f;
 
@@ -27,7 +28,7 @@ namespace Climbing
         public Point leftMost;
         public Point rightMost;
 
-        [HideInInspector]
+        //[HideInInspector]
         public List<Point> pointsInOrder;
 
         void HandlePrefab()
@@ -173,6 +174,14 @@ namespace Climbing
             {
                 DeleteAll();
                 deleteAll = false;
+            }
+
+            if (updatePointList)
+            {
+                Point[] points = GetComponentsInChildren<Point>();
+                pointsInOrder = new List<Point>();
+                pointsInOrder.AddRange(points);
+                updatePointList = false;
             }
         }
     }
