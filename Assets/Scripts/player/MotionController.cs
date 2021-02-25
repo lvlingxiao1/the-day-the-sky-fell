@@ -19,15 +19,16 @@ public class MotionController : MonoBehaviour {
     bool frontDetected;
     int grabStuckSecondChance;
     enum States {
-        NORMAL,
-        LADDER_ENTER,
-        ON_LADDER,
-        LADDER_EXIT,
-        GRAB,
-        GRAB_STABLE,
-        LEDGE_CLIMB_UP
+        Normal,
+        LadderEnter,
+        OnLadder,
+        LadderExit,
+        Grab,
+        GrabStable,
+        LedgeClimbUp,
+        OnClimbGrid
     }
-    States state = States.NORMAL;
+    States state = States.Normal;
     Ladder currentLadder;
     Vector3 newVelocity;
     Vector3 rootMotionDelta;
@@ -89,7 +90,7 @@ public class MotionController : MonoBehaviour {
         FindInteractType();
 
         switch (state) {
-            case States.NORMAL:
+            case States.Normal:
                 if (grounded) {
                     if (input.moveMagnitude > 0.1) {
                         Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
@@ -110,7 +111,7 @@ public class MotionController : MonoBehaviour {
                         hangCollider.enabled = true;
                         grabArmCollider.enabled = true;
                         grabStuckSecondChance = 1;  // velocity becomes 0 once when jumping up 
-                        state = States.GRAB;
+                        state = States.Grab;
                     }
                 }
 
@@ -120,7 +121,7 @@ public class MotionController : MonoBehaviour {
                         animator.SetBool("climb", true);
                         currentLadder = hitInfo.collider.GetComponentInParent<Ladder>();
                         currentLadder.GetOntoLadder(transform, modelTransform, forwardSpeed);
-                        state = States.LADDER_ENTER;
+                        state = States.LadderEnter;
                     } else if (interact == InteractType.LedgeBelow) {
                         hangCollider.enabled = true;
                         grabArmCollider.enabled = true;
@@ -128,7 +129,7 @@ public class MotionController : MonoBehaviour {
                         animator.SetBool("on_ledge", true);
                         ledgeDetector.EnterLedge();
                         camera.ResetCamera(modelTransform.eulerAngles);
-                        state = States.GRAB;
+                        state = States.Grab;
                     } else if (interact == InteractType.Dialogue) {
                         // trigger dialogue
                         DialogueTrigger trigger = hitInfo.collider.GetComponentInParent<DialogueTrigger>();
@@ -142,24 +143,24 @@ public class MotionController : MonoBehaviour {
                 break;
 
 
-            case States.ON_LADDER:
+            case States.OnLadder:
                 if (input.cancelBtnDown || input.interactBtnDown) {
-                    state = States.NORMAL;
+                    state = States.Normal;
                     rb.useGravity = true;
                     animator.SetBool("climb", false);
                 }
                 if (transform.position.y >= currentLadder.TopY - 1.70f) {
                     transform.position = new Vector3(transform.position.x, currentLadder.TopY - 1.65f, transform.position.z);
-                    state = States.LADDER_EXIT;
+                    state = States.LadderExit;
                     animator.SetTrigger("ladder_top");
                 } else if (grounded) {
                     SetStateNormal();
                 }
                 break;
 
-            case States.GRAB_STABLE:
+            case States.GrabStable:
                 if (Mathf.Abs(rb.velocity.y) > 0.1) {
-                    state = States.GRAB;
+                    state = States.Grab;
                     break;
                 }
                 ledgeDetector.AdjustFacingToLedge();
@@ -187,7 +188,7 @@ public class MotionController : MonoBehaviour {
     private void FixedUpdate() {
         rb.position += rootMotionDelta;
         switch (state) {
-            case States.NORMAL:
+            case States.Normal:
                 if (grounded) {
                     newVelocity = forwardSpeed * input.goingForward * camera.forward + forwardSpeed * input.goingRight * camera.right;
                     newVelocity.y = rb.velocity.y;
@@ -198,17 +199,17 @@ public class MotionController : MonoBehaviour {
                     rb.velocity = newVelocity;
                 }
                 break;
-            case States.ON_LADDER:
+            case States.OnLadder:
                 Vector3 newPos = rb.position + 2.0f * input.goingForward * Vector3.up * Time.fixedDeltaTime;
                 if (newPos.y < currentLadder.TopY - 1.65f) {
                     rb.position = newPos;
                 }
                 break;
 
-            case States.GRAB:
+            case States.Grab:
                 if (Mathf.Abs(rb.velocity.y) < 1e-4) {
                     if (ledgeDetector.AdjustFacingToLedge())
-                        state = States.GRAB_STABLE;
+                        state = States.GrabStable;
                     else if (grabStuckSecondChance > 0) {
                         grabStuckSecondChance--;
                     } else {
@@ -219,7 +220,7 @@ public class MotionController : MonoBehaviour {
                 }
                 break;
 
-            case States.GRAB_STABLE:
+            case States.GrabStable:
                 newVelocity = ledgeSpeed * input.goingRight * modelTransform.right;
                 newVelocity.y = rb.velocity.y;
                 rb.velocity = newVelocity;
@@ -237,7 +238,7 @@ public class MotionController : MonoBehaviour {
     void FindInteractType() {
         interact = InteractType.None;
         interactHintText.text = "";
-        if (state == States.NORMAL) {
+        if (state == States.Normal) {
             if (frontDetected) {
                 if (hitInfo.collider.CompareTag("ladder")) {
                     interact = InteractType.Ladder;
@@ -266,17 +267,18 @@ public class MotionController : MonoBehaviour {
                 //    interactHintText.text = "Press F to Climb Ledge Above";
                 //}
             }
-        } else if (state == States.GRAB_STABLE) {
+        } else if (state == States.GrabStable) {
             interactHintText.text = "Press R to Climb Up";
         }
     }
 
     public void SetStateOnLadder() {
-        state = States.ON_LADDER;
+        state = States.OnLadder;
         rb.velocity = Vector3.zero;
     }
     public void SetStateNormal() {
-        state = States.NORMAL;
+        state = States.Normal;
+        rb.isKinematic = false;
         rb.useGravity = true;
         rb.velocity = Vector3.zero;
         mainCollider.enabled = true;
@@ -286,19 +288,20 @@ public class MotionController : MonoBehaviour {
         animator.SetBool("on_ledge", false);
     }
     public void AddRootMotionDelta(Vector3 delta) {
-        if (state == States.NORMAL || state == States.ON_LADDER || state == States.GRAB) return;
+        if (state != States.LadderEnter && state != States.LadderExit && state != States.LedgeClimbUp) return;
         rootMotionDelta += delta;
     }
 
-    public void EnableMotionController() {
-        input.inputEnabled = true;
-        rb.isKinematic = false;
-        GetComponent<Collider>().isTrigger = false;
+    public void SetStateOnClimbGrid() {
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        mainCollider.enabled = false;
+        hangCollider.enabled = false;
+        grabArmCollider.enabled = false;
+        state = States.OnClimbGrid;
     }
 
-    public void DisableMotionController() {
-        input.inputEnabled = false;
-        rb.isKinematic = true;
-        GetComponent<Collider>().isTrigger = true;
+    public bool IsInGrabState() {
+        return state == States.Grab;
     }
 }

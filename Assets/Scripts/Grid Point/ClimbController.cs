@@ -12,6 +12,7 @@ namespace Climbing
         bool initClimb;
         bool waitToStartClimb;
 
+        PlayerInput input;
         Animator anim;
         ClimbIK ik;
         MotionController mc;
@@ -87,6 +88,7 @@ namespace Climbing
 
         void Start()
         {
+            input = FindObjectOfType<PlayerInput>();
             anim = GetComponentInChildren<Animator>();
             mc = GetComponent<MotionController>();
             ik = GetComponentInChildren<ClimbIK>();
@@ -117,7 +119,8 @@ namespace Climbing
                     initClimb = false;
                 }
 
-                if (Input.GetButton("Grab"))
+                //if (input.grabBtnDown)
+                if (mc.IsInGrabState())
                 {
                     LookForClimbSpot();
                 }
@@ -166,7 +169,7 @@ namespace Climbing
                     if (distanceToPoint < 1.5)
                     {
                         // Enter mount animation, revoke user control
-                        mc.DisableMotionController();
+                        mc.SetStateOnClimbGrid();
                         lockInput = true;
                         climbing = true;
 
@@ -200,8 +203,8 @@ namespace Climbing
         {
             if (!lockInput)
             {
-                float hori = Input.GetAxis("Horizontal");
-                float verti = Input.GetAxis("Vertical");
+                float hori = input.goingRight;
+                float verti = input.goingForward;
 
                 inputDirection = ConvertToInputDirection(hori, verti);
 
@@ -755,7 +758,8 @@ namespace Climbing
             {
                 climbing = false;
                 initTransit = false;
-                mc.EnableMotionController();
+                //mc.SetStateOnClimbGrid2();
+                mc.SetStateNormal();
                 anim.SetBool("GP_OnGrid", false);
                 anim.SetBool("GP_Move", false);
             }
@@ -765,15 +769,17 @@ namespace Climbing
         #region FallOff
         void InitFallOff()
         {
-            if (climbState == ClimbStates.onPoint)
+            //if (climbState == ClimbStates.onPoint)
             {
-                if (Input.GetKey(KeyCode.X))
+                if (input.releaseBtnDown)
                 {
                     climbing = false;
                     initTransit = false;
                     ik.SetAllIKWeights(0);
-                    mc.EnableMotionController();
+                    //mc.SetStateOnClimbGrid2();
+                    mc.SetStateNormal();
                     anim.SetBool("GP_OnGrid", false);
+                    anim.SetBool("GP_Move", false);
                     anim.SetBool("grounded", false);
                 }
             }
