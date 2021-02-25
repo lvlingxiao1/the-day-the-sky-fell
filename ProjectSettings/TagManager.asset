@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ladder
   - DialogueTrigger
+  - checkpoint
   layers:
   - Default
   - TransparentFX

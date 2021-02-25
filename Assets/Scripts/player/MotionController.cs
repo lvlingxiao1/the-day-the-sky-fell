@@ -9,6 +9,8 @@ public class MotionController : MonoBehaviour {
     public float interactDetectDistance = 1.0f;
     public float ledgeSpeed = 3f;
 
+    public string defaultCheckpoint;
+
     // user inputs
     bool jumpPending = false;
 
@@ -34,7 +36,8 @@ public class MotionController : MonoBehaviour {
         Ladder,
         LedgeBelow,
         LedgeAbove,
-        Dialogue
+        Dialogue,
+        Checkpoint
     }
     InteractType interact;
     RaycastHit hitInfo;
@@ -44,7 +47,7 @@ public class MotionController : MonoBehaviour {
     Animator animator;
     AudioManager audioManager;
     Text debugText;
-    Transform modelTransform;
+    [HideInInspector] public Transform modelTransform;
     GroundDetector groundDetector;
     InteractDetector interactDetector;
     LedgeDetector ledgeDetector;
@@ -54,10 +57,11 @@ public class MotionController : MonoBehaviour {
     Text interactHintText;
     PlayerInput input;
     new CameraController camera;
+    CheckpointManager currentCheckpoint;
 
 
     void Awake() {
-        input = FindObjectOfType<PlayerInput>();
+        input = GetComponent<PlayerInput>();
         camera = FindObjectOfType<CameraController>();
         audioManager = FindObjectOfType<AudioManager>();
 
@@ -75,6 +79,8 @@ public class MotionController : MonoBehaviour {
         groundDetector = new GroundDetector(transform);
         interactDetector = new InteractDetector(transform, modelTransform);
         ledgeDetector = new LedgeDetector(transform, modelTransform);
+
+        currentCheckpoint = GameObject.Find(defaultCheckpoint).GetComponent<CheckpointManager>();
     }
 
     void Update() {
@@ -127,6 +133,9 @@ public class MotionController : MonoBehaviour {
                         // trigger dialogue
                         DialogueTrigger trigger = hitInfo.collider.GetComponentInParent<DialogueTrigger>();
                         trigger.TriggerDialogue();
+                    } else if (interact == InteractType.Checkpoint) {
+                        currentCheckpoint = hitInfo.collider.GetComponent<CheckpointManager>();
+                        // some animation needs to happen here
                     }
                 }
 
@@ -167,6 +176,10 @@ public class MotionController : MonoBehaviour {
         animator.SetFloat("forward", input.moveMagnitude);
         animator.SetBool("grounded", grounded);
         animator.SetFloat("vertical_speed", rb.velocity.y);
+
+        if (transform.position.y < -80) {
+            currentCheckpoint.Respawn(this);
+        }
 
         debugText.text = $"{state} {rb.velocity}";
     }
@@ -230,10 +243,13 @@ public class MotionController : MonoBehaviour {
                     interact = InteractType.Ladder;
                     interactHintText.text = "Press F to Climb Ladder";
                     return;
-                }
-                else if (hitInfo.collider.CompareTag("DialogueTrigger")) {
+                } else if (hitInfo.collider.CompareTag("DialogueTrigger")) {
                     interact = InteractType.Dialogue;
                     interactHintText.text = "Press F to Talk";
+                    return;
+                } else if (hitInfo.collider.CompareTag("checkpoint")) {
+                    interact = InteractType.Checkpoint;
+                    interactHintText.text = "Press F to Take a Break at Checkpoint";
                     return;
                 }
             }
@@ -274,15 +290,13 @@ public class MotionController : MonoBehaviour {
         rootMotionDelta += delta;
     }
 
-    public void EnableMotionController()
-    {
+    public void EnableMotionController() {
         input.inputEnabled = true;
         rb.isKinematic = false;
         GetComponent<Collider>().isTrigger = false;
     }
 
-    public void DisableMotionController()
-    {
+    public void DisableMotionController() {
         input.inputEnabled = false;
         rb.isKinematic = true;
         GetComponent<Collider>().isTrigger = true;

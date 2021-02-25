@@ -117,7 +117,7 @@ namespace Climbing
                     initClimb = false;
                 }
 
-                if (Input.GetButton("Jump"))
+                if (Input.GetButton("Grab"))
                 {
                     LookForClimbSpot();
                 }

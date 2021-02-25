@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class CameraController : MonoBehaviour {
-    public float cameraSpeedX;
-    public float cameraSpeedY;
-    public float peakOffset;    
+    public float cameraSpeedMouseX = 180;
+    public float cameraSpeedMouseY = 60;
+    public float cameraSpeedKeyboardX = 180;
+    public float cameraSpeedKeyboardY = 60;
+    public float peakOffset;
 
     PlayerInput input;
     Vector3 defaultLocalPosition;
@@ -48,8 +50,13 @@ public class CameraController : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        targetRotation.y += input.mouseMoveX * cameraSpeedX * Time.fixedDeltaTime;
-        targetRotation.x -= input.mouseMoveY * cameraSpeedY * Time.fixedDeltaTime;
+        if (Mathf.Abs(input.cameraHorizontal) < 0.01 && Mathf.Abs(input.cameraVertical) < 0.01) {
+            targetRotation.y += input.mouseMoveX * cameraSpeedMouseX * Time.fixedDeltaTime;
+            targetRotation.x -= input.mouseMoveY * cameraSpeedMouseY * Time.fixedDeltaTime;
+        } else {
+            targetRotation.y += input.cameraHorizontal * cameraSpeedKeyboardX * Time.fixedDeltaTime;
+            targetRotation.x -= input.cameraVertical * cameraSpeedKeyboardY * Time.fixedDeltaTime;
+        }
         targetRotation.x = Mathf.Clamp(targetRotation.x, -40, 70);
         transform.eulerAngles = targetRotation;
 
@@ -77,7 +84,7 @@ public class CameraController : MonoBehaviour {
                 out RaycastHit hitInfo, localDistance, environment);
         if (hit) {
             cameraHandle.localPosition = Vector3.Lerp(cameraHandle.localPosition,
-                (hitInfo.distance - 0.1f) / localDistance * targetLocalPosition , 0.3f);
+                (hitInfo.distance - 0.1f) / localDistance * targetLocalPosition, 0.3f);
             if (hitInfo.distance < 1f) {
                 player_renderer1.enabled = false;
                 player_renderer2.enabled = false;
