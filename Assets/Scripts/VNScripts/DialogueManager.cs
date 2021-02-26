@@ -8,22 +8,14 @@ public class DialogueManager : MonoBehaviour {
     public Text dialogueText;
     public Image speakerSprite;
     public Animator animator;
-    private PlayerInput input;
     private Sentence[] dialogue;
     private int index;
-    private bool isInDialogue = false;
-
-    void Awake() {
-        input = FindObjectOfType<PlayerInput>();
-    }
 
     public void StartDialogue(Sentence[] dialogue) {
-        input.inputEnabled = false;
         animator.SetBool("isOpen", true);
 
         index = 0;
         this.dialogue = dialogue;
-        isInDialogue = true;
 
         DisplayNextSentence();
     }
@@ -51,15 +43,6 @@ public class DialogueManager : MonoBehaviour {
 
     void EndDialogue() {
         animator.SetBool("isOpen", false);
-        input.inputEnabled = true;
-        isInDialogue = false;
-    }
-
-    private void Update() {
-        if (isInDialogue) {
-            if (Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0)) {
-                DisplayNextSentence();
-            }
-        }
+        FindObjectOfType<MotionController>().SetStateNormal();
     }
 }

@@ -29,7 +29,8 @@ public class MotionController : MonoBehaviour {
         Grab,
         GrabStable,
         LedgeClimbUp,
-        OnClimbGrid
+        OnClimbGrid,
+        Dialogue
     }
     States state = States.Normal;
     Ladder currentLadder;
@@ -63,6 +64,7 @@ public class MotionController : MonoBehaviour {
     new CameraController camera;
     CheckpointManager currentCheckpoint;
     ClimbController climbController;
+    DialogueManager dialogueManager;
 
 
     void Awake() {
@@ -86,6 +88,8 @@ public class MotionController : MonoBehaviour {
         ledgeDetector = new LedgeDetector(transform, modelTransform);
 
         climbController = GetComponent<ClimbController>();
+
+        dialogueManager = FindObjectOfType<DialogueManager>();
 
         currentCheckpoint = GameObject.Find(defaultCheckpoint).GetComponent<CheckpointManager>();
     }
@@ -146,6 +150,7 @@ public class MotionController : MonoBehaviour {
                         // trigger dialogue
                         DialogueTrigger trigger = hitInfo.collider.GetComponentInParent<DialogueTrigger>();
                         trigger.TriggerDialogue();
+                        state = States.Dialogue;
                     } else if (interact == InteractType.Checkpoint) {
                         currentCheckpoint = hitInfo.collider.GetComponent<CheckpointManager>();
                         // some animation needs to happen here
@@ -187,6 +192,12 @@ public class MotionController : MonoBehaviour {
                     climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed, 0.3f);
                 } else {
                     climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 2, 0.3f);
+                }
+                break;
+
+            case States.Dialogue:
+                if (input.jumpPressed || Input.GetMouseButtonDown(0)) {
+                    dialogueManager.DisplayNextSentence();
                 }
                 break;
         }
