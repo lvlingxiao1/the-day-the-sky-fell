@@ -7,12 +7,13 @@ public class DialogueManager : MonoBehaviour {
     public Text nameText;
     public Text dialogueText;
     public Image speakerSprite;
-    public Animator animator;
+    public Animator dialogueAnimator;
+    public Animator blackScreenAnimator;
     private Sentence[] dialogue;
     private int index;
 
     public void StartDialogue(Sentence[] dialogue) {
-        animator.SetBool("isOpen", true);
+        dialogueAnimator.SetBool("isOpen", true);
 
         index = 0;
         this.dialogue = dialogue;
@@ -29,7 +30,12 @@ public class DialogueManager : MonoBehaviour {
         StopAllCoroutines();
         StartCoroutine(TypeSentence(dialogue[index].content));
         nameText.text = dialogue[index].name;
-        speakerSprite.sprite = dialogue[index].sprite;
+        if (dialogue[index].sprite) {
+            speakerSprite.sprite = dialogue[index].sprite;
+            speakerSprite.color = Color.white;
+        } else {
+            speakerSprite.color = Color.clear;
+        }
         index++;
     }
 
@@ -42,7 +48,11 @@ public class DialogueManager : MonoBehaviour {
     }
 
     void EndDialogue() {
-        animator.SetBool("isOpen", false);
+        dialogueAnimator.SetBool("isOpen", false);
         FindObjectOfType<MotionController>().SetStateNormal();
+    }
+
+    public void BlackScreen() {
+        blackScreenAnimator.SetTrigger("start");
     }
 }

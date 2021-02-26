@@ -150,10 +150,13 @@ public class MotionController : MonoBehaviour {
                         // trigger dialogue
                         DialogueTrigger trigger = hitInfo.collider.GetComponentInParent<DialogueTrigger>();
                         trigger.TriggerDialogue();
+                        rb.isKinematic = true;
                         state = States.Dialogue;
                     } else if (interact == InteractType.Checkpoint) {
                         currentCheckpoint = hitInfo.collider.GetComponent<CheckpointManager>();
-                        // some animation needs to happen here
+                        currentCheckpoint.TriggerDialogue(dialogueManager);
+                        rb.isKinematic = true;
+                        state = States.Dialogue;
                     }
                 }
 
@@ -199,6 +202,7 @@ public class MotionController : MonoBehaviour {
                 if (input.jumpPressed || Input.GetMouseButtonDown(0)) {
                     dialogueManager.DisplayNextSentence();
                 }
+                input.moveMagnitude = 0;
                 break;
         }
 
@@ -208,7 +212,7 @@ public class MotionController : MonoBehaviour {
         animator.SetFloat("vertical_speed", rb.velocity.y);
 
         if (transform.position.y < -80) {
-            currentCheckpoint.Respawn(this);
+            currentCheckpoint.Respawn(this, dialogueManager);
         }
 
         debugText.text = $"{state} {rb.velocity}";
