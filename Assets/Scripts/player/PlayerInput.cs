@@ -15,6 +15,7 @@ public class PlayerInput : MonoBehaviour {
     [HideInInspector] public bool grabBtnDown;
     [HideInInspector] public bool cancelBtnDown;
     [HideInInspector] public bool releaseBtnDown;
+    [HideInInspector] public bool runBtnHold;
 
     [HideInInspector] public float mouseMoveX;
     [HideInInspector] public float mouseMoveY;
@@ -40,6 +41,7 @@ public class PlayerInput : MonoBehaviour {
             cancelBtnDown = Input.GetButtonDown("Cancel");
             grabBtnDown = Input.GetButtonDown("Grab");
             releaseBtnDown = Input.GetButtonDown("Release");
+            runBtnHold = Input.GetButton("Run");
 
             // elliptical grid mapping: https://arxiv.org/ftp/arxiv/papers/1509/1509.06344.pdf
             goingForward = verticleInputRaw * Mathf.Sqrt(1 - horizontalInputRaw * horizontalInputRaw * 0.5f);

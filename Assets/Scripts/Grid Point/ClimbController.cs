@@ -131,9 +131,9 @@ namespace Climbing
         {
             // TODO: spaghetti code here, need refactoring 
             // (adjustable player center or a game object as player center origin)
-            float maxDistance = 5;
+            float maxDistance = 2;
 
-            Vector3 playerCenter = transform.position + new Vector3(0, 0.9f, 0);
+            Vector3 playerCenter = transform.position +(modelTransform.rotation * new Vector3(0, 0.9f, -0.3f));
             Ray ray = new Ray(playerCenter, modelTransform.forward);
             Debug.DrawLine(playerCenter, playerCenter + (maxDistance * modelTransform.forward), Color.cyan);
             RaycastHit hitInfo;
@@ -166,7 +166,7 @@ namespace Climbing
                     // since point is attached to hip position for ik, parant would be the actual point position
                     float distanceToPoint = Vector3.Distance(playerCenter, closestPoint.transform.parent.position);
                     //Debug.Log(distanceToPoint);
-                    if (distanceToPoint < 1.5)
+                    if (distanceToPoint < 1.8)
                     {
                         // Enter mount animation, revoke user control
                         mc.SetStateOnClimbGrid();

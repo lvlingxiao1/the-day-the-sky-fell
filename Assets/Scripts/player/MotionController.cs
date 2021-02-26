@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Climbing;
 
 public class MotionController : MonoBehaviour {
     public float forwardSpeed = 5f;
     public float jumpSpeed = 8f;
     public float interactDetectDistance = 1.0f;
     public float ledgeSpeed = 3f;
+    public float climbGridSpeed = 3f;
 
     public string defaultCheckpoint;
 
@@ -17,6 +19,7 @@ public class MotionController : MonoBehaviour {
     // attributes
     bool grounded;
     bool frontDetected;
+    float speedFactor;
     int grabStuckSecondChance;
     enum States {
         Normal,
@@ -59,6 +62,7 @@ public class MotionController : MonoBehaviour {
     PlayerInput input;
     new CameraController camera;
     CheckpointManager currentCheckpoint;
+    ClimbController climbController;
 
 
     void Awake() {
@@ -81,6 +85,8 @@ public class MotionController : MonoBehaviour {
         interactDetector = new InteractDetector(transform, modelTransform);
         ledgeDetector = new LedgeDetector(transform, modelTransform);
 
+        climbController = GetComponent<ClimbController>();
+
         currentCheckpoint = GameObject.Find(defaultCheckpoint).GetComponent<CheckpointManager>();
     }
 
@@ -92,6 +98,12 @@ public class MotionController : MonoBehaviour {
         switch (state) {
             case States.Normal:
                 if (grounded) {
+                    if (input.runBtnHold) {
+                        speedFactor = Mathf.Lerp(speedFactor, 2, 0.3f);
+                    } else {
+                        speedFactor = Mathf.Lerp(speedFactor, 1, 0.3f);
+                    }
+
                     if (input.moveMagnitude > 0.1) {
                         Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
                         modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.4f);
@@ -144,10 +156,8 @@ public class MotionController : MonoBehaviour {
 
 
             case States.OnLadder:
-                if (input.cancelBtnDown || input.interactBtnDown) {
-                    state = States.Normal;
-                    rb.useGravity = true;
-                    animator.SetBool("climb", false);
+                if (input.releaseBtnDown || input.interactBtnDown) {
+                    SetStateNormal();
                 }
                 if (transform.position.y >= currentLadder.TopY - 1.70f) {
                     transform.position = new Vector3(transform.position.x, currentLadder.TopY - 1.65f, transform.position.z);
@@ -167,14 +177,22 @@ public class MotionController : MonoBehaviour {
                 if (input.grabBtnDown) {  // teleport up
                     transform.position += modelTransform.forward * ledgeDetector.hangOffsetZ * 2 + new Vector3(0, -ledgeDetector.hangOffsetY, 0);
                     SetStateNormal();
-                } else if (input.goingForward < 0) {
+                } else if (input.releaseBtnDown || input.goingForward < 0) {
                     SetStateNormal();
+                }
+                break;
+
+            case States.OnClimbGrid:
+                if (input.runBtnHold) {
+                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 2, 0.3f);
+                } else {
+                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed, 0.3f);
                 }
                 break;
         }
 
 
-        animator.SetFloat("forward", input.moveMagnitude);
+        animator.SetFloat("forward", input.moveMagnitude * speedFactor);
         animator.SetBool("grounded", grounded);
         animator.SetFloat("vertical_speed", rb.velocity.y);
 
@@ -190,7 +208,7 @@ public class MotionController : MonoBehaviour {
         switch (state) {
             case States.Normal:
                 if (grounded) {
-                    newVelocity = forwardSpeed * input.goingForward * camera.forward + forwardSpeed * input.goingRight * camera.right;
+                    newVelocity = (forwardSpeed * input.goingForward * camera.forward + forwardSpeed * input.goingRight * camera.right) * speedFactor;
                     newVelocity.y = rb.velocity.y;
                     if (jumpPending) {
                         newVelocity.y += jumpSpeed;
