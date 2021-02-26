@@ -98,10 +98,10 @@ public class MotionController : MonoBehaviour {
         switch (state) {
             case States.Normal:
                 if (grounded) {
-                    if (input.runBtnHold) {
-                        speedFactor = Mathf.Lerp(speedFactor, 2, 0.3f);
-                    } else {
+                    if (input.slowBtnHold) {
                         speedFactor = Mathf.Lerp(speedFactor, 1, 0.3f);
+                    } else {
+                        speedFactor = Mathf.Lerp(speedFactor, 2, 0.3f);
                     }
 
                     if (input.moveMagnitude > 0.1) {
@@ -183,10 +183,10 @@ public class MotionController : MonoBehaviour {
                 break;
 
             case States.OnClimbGrid:
-                if (input.runBtnHold) {
-                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 2, 0.3f);
-                } else {
+                if (input.slowBtnHold) {
                     climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed, 0.3f);
+                } else {
+                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 2, 0.3f);
                 }
                 break;
         }
