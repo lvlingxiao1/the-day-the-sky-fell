@@ -302,7 +302,9 @@ public class MotionController : MonoBehaviour {
                 //}
             }
         } else if (state == States.GrabStable) {
-            interactHintText.text = "Press R to Climb Up";
+            interactHintText.text = "Press R to Climb Up, X to Drop Down";
+        } else if (state == States.OnClimbGrid) {
+            interactHintText.text = "Press X to Drop Down";
         }
     }
 
