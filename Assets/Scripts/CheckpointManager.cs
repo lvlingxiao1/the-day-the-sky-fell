@@ -25,7 +25,7 @@ public class CheckpointManager : MonoBehaviour {
     }
 
     private IEnumerator respawnCoroutine(MotionController controller) {
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.9f);
         controller.transform.position = respawnPosition;
         controller.modelTransform.eulerAngles = respawnRotation;
         controller.SetStateNormal();

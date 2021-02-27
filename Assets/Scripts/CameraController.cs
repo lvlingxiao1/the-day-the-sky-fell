@@ -20,6 +20,7 @@ public class CameraController : MonoBehaviour {
     int environment;
     SkinnedMeshRenderer player_renderer1;
     SkinnedMeshRenderer player_renderer2;
+    SkinnedMeshRenderer player_renderer3;
     Transform mainCamera;
     Transform cameraHandle;
 
@@ -43,8 +44,9 @@ public class CameraController : MonoBehaviour {
         nextRotation = targetRotation;
 
         environment = LayerMask.GetMask("environment");
-        player_renderer1 = GameObject.Find("Alpha_Surface").GetComponent<SkinnedMeshRenderer>();
-        player_renderer2 = GameObject.Find("Alpha_Joints").GetComponent<SkinnedMeshRenderer>();
+        player_renderer1 = GameObject.Find("BodyMesh").GetComponent<SkinnedMeshRenderer>();
+        player_renderer2 = GameObject.Find("BackpackMesh").GetComponent<SkinnedMeshRenderer>();
+        player_renderer3 = GameObject.Find("HairMesh").GetComponent<SkinnedMeshRenderer>();
 
         //debugText = GameObject.Find("debugText").GetComponent<Text>();
     }
@@ -88,6 +90,7 @@ public class CameraController : MonoBehaviour {
             if (hitInfo.distance < 1f) {
                 player_renderer1.enabled = false;
                 player_renderer2.enabled = false;
+                player_renderer3.enabled = false;
                 return;
             }
         } else {
@@ -95,6 +98,7 @@ public class CameraController : MonoBehaviour {
         }
         player_renderer1.enabled = true;
         player_renderer2.enabled = true;
+        player_renderer3.enabled = true;
     }
 
     public void ResetCamera(Vector3 modelRotation) {

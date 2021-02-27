@@ -178,6 +178,7 @@ public class MotionController : MonoBehaviour {
 
             case States.GrabStable:
                 if (Mathf.Abs(rb.velocity.y) > 0.1) {
+                    print("asdf");
                     state = States.Grab;
                     break;
                 }
