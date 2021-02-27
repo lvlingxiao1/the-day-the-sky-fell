@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ladder
   - DialogueTrigger
+  - checkpoint
   layers:
   - Default
   - TransparentFX
@@ -37,7 +38,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Climbable
   - 
   m_SortingLayers:
   - name: Default

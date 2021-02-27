@@ -10,10 +10,10 @@ public class LedgeDetector {
     readonly Transform modelTransform;
     readonly Text debugText;
     public readonly float hangOffsetY = -2.224f;
-    public readonly float hangOffsetZ;
+    public readonly float hangOffsetZ = 0.258f;
     readonly Vector3 adjustFacingPoint1 = new Vector3(0f, 2f, -0.2f);
-    readonly Vector3 adjustFacingPoint2 = new Vector3(-0.4f, 2.2f, -0.2f);
-    readonly Vector3 adjustFacingPoint3 = new Vector3(0.4f, 2.2f, -0.2f);
+    readonly Vector3 adjustFacingPoint2 = new Vector3(-0.4f, 2.1f, -0.2f);
+    readonly Vector3 adjustFacingPoint3 = new Vector3(0.4f, 2.1f, -0.2f);
     readonly float adjustDetectDistance = 0.7f;
     private RaycastHit hitInfo;
 
@@ -21,7 +21,7 @@ public class LedgeDetector {
         this.playerTransform = playerTransform;
         this.modelTransform = modelTransform;
         debugText = GameObject.Find("debugText").GetComponent<Text>();
-        hangOffsetZ = playerTransform.GetComponent<CapsuleCollider>().radius;
+        //hangOffsetZ = playerTransform.GetComponent<CapsuleCollider>().radius;
     }
 
     public void EnterLedge() {
