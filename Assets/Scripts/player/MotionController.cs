@@ -178,7 +178,6 @@ public class MotionController : MonoBehaviour {
 
             case States.GrabStable:
                 if (Mathf.Abs(rb.velocity.y) > 0.1) {
-                    print("asdf");
                     state = States.Grab;
                     break;
                 }
@@ -255,7 +254,12 @@ public class MotionController : MonoBehaviour {
                 break;
 
             case States.GrabStable:
-                newVelocity = ledgeSpeed * input.goingRight * modelTransform.right;
+                if ((input.goingRight > 0 && ledgeDetector.CanMoveRight())
+                    || (input.goingRight < 0 && ledgeDetector.CanMoveLeft())) {
+                    newVelocity = ledgeSpeed * input.goingRight * modelTransform.right;
+                } else {
+                    newVelocity = Vector3.zero;
+                }
                 newVelocity.y = rb.velocity.y;
                 rb.velocity = newVelocity;
                 if (grounded) {

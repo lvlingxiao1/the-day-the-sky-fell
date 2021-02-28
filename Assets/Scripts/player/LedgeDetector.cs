@@ -17,6 +17,10 @@ public class LedgeDetector {
     readonly float adjustDetectDistance = 0.7f;
     private RaycastHit hitInfo;
 
+    private Vector3 canMoveRightColliderPos = new Vector3(0.362f, 2.11f, 0.311f);
+    private Vector3 canMoveLeftColliderPos = new Vector3(-0.362f, 2.11f, 0.311f);
+    private float canMoveColliderSize = 0.07f;
+
     public LedgeDetector(Transform playerTransform, Transform modelTransform) {
         this.playerTransform = playerTransform;
         this.modelTransform = modelTransform;
@@ -57,5 +61,14 @@ public class LedgeDetector {
         playerTransform.position = newPos;
         modelTransform.forward = newForward;
         return true;
+    }
+
+    public bool CanMoveRight() {
+        Collider[] hit = Physics.OverlapSphere(playerTransform.position + modelTransform.rotation * canMoveRightColliderPos, canMoveColliderSize, environment);
+        return hit.Length > 0;
+    }
+    public bool CanMoveLeft() {
+        Collider[] hit = Physics.OverlapSphere(playerTransform.position + modelTransform.rotation * canMoveLeftColliderPos, canMoveColliderSize, environment);
+        return hit.Length > 0;
     }
 }

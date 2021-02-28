@@ -25,7 +25,10 @@ public class PlayerInput : MonoBehaviour {
     private float verticleInputRaw;
     private float horizontalInputRaw;
 
-    // Update is called once per frame
+    private void Awake() {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     void Update() {
         mouseMoveX = Input.GetAxis("Mouse X");
         mouseMoveY = Input.GetAxis("Mouse Y");
