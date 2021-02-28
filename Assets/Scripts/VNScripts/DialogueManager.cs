@@ -11,6 +11,12 @@ public class DialogueManager : MonoBehaviour {
     public Animator blackScreenAnimator;
     private Sentence[] dialogue;
     private int index;
+    private AudioManager audioManager;
+    private string prevAudio = "";
+
+    private void Awake() {
+        audioManager = FindObjectOfType<AudioManager>();
+    }
 
     public void StartDialogue(Sentence[] dialogue) {
         dialogueAnimator.SetBool("isOpen", true);
@@ -35,6 +41,12 @@ public class DialogueManager : MonoBehaviour {
             speakerSprite.color = Color.white;
         } else {
             speakerSprite.color = Color.clear;
+        }
+        string audio = dialogue[index].audio;
+        if (audio != null && audio != "") {
+            audioManager.Stop(prevAudio);
+            audioManager.Play(audio);
+            prevAudio = audio;
         }
         index++;
     }
