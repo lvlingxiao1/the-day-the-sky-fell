@@ -5,7 +5,7 @@ using UnityEngine;
 public class CheckpointManager : MonoBehaviour {
     public Vector3 respawnPositionOffset;
     private Sentence[] checkpointMessage = {
-        new Sentence("", "Stamina recovered", null)
+        new Sentence("", "Stamina recovered", null, "vending machine")
     };
     private Vector3 respawnPosition;
     private Vector3 respawnRotation;
