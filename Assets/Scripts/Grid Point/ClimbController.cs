@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 namespace Climbing
@@ -12,6 +13,7 @@ namespace Climbing
         bool initClimb;
         bool waitToStartClimb;
 
+        Text transitionHint;
         PlayerInput input;
         Animator anim;
         ClimbIK ik;
@@ -93,6 +95,7 @@ namespace Climbing
             mc = GetComponent<MotionController>();
             ik = GetComponentInChildren<ClimbIK>();
             modelTransform = GameObject.Find("PlayerModel").transform;
+            transitionHint = GameObject.Find("GP_TransitionHint").GetComponent<Text>();
             SetCurveReferences();
         }
 
@@ -762,6 +765,7 @@ namespace Climbing
                 mc.SetStateNormal();
                 anim.SetBool("GP_OnGrid", false);
                 anim.SetBool("GP_Move", false);
+                transitionHint.text = "";
             }
         }
         #endregion
@@ -781,6 +785,7 @@ namespace Climbing
                     anim.SetBool("GP_OnGrid", false);
                     anim.SetBool("GP_Move", false);
                     anim.SetBool("grounded", false);
+                    transitionHint.text = "";
                 }
             }
         }
@@ -812,6 +817,15 @@ namespace Climbing
             if (climbState == ClimbStates.onPoint)
             {
                 currentPoint = targetPoint;
+                Neighbor n = currentClimbObjManager.GetNeighborForDirection(Vector3.down, currentPoint);
+                if (n != null)
+                {
+                    transitionHint.text = "Press S to Climb Down";
+                }
+                else
+                {
+                    transitionHint.text = "";
+                }
             }
 
             initTransit = false;
