@@ -43,7 +43,7 @@ public class PlayerInput : MonoBehaviour {
             interactBtnDown = Input.GetButtonDown("Interact");
             cancelBtnDown = Input.GetButtonDown("Cancel");
             grabBtnDown = Input.GetButtonDown("Grab");
-            releaseBtnDown = Input.GetButtonDown("Release");
+            releaseBtnDown = Input.GetButton("Release");
             slowBtnHold = Input.GetButton("Slow");
 
             // elliptical grid mapping: https://arxiv.org/ftp/arxiv/papers/1509/1509.06344.pdf

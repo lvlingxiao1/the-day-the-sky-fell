@@ -17,7 +17,8 @@ public class MotionController : MonoBehaviour {
     bool jumpPending = false;
 
     // attributes
-    bool grounded;
+    public bool grounded;
+    bool prevGrounded = true;
     bool frontDetected;
     float speedFactor;
     int grabStuckSecondChance;
@@ -96,6 +97,8 @@ public class MotionController : MonoBehaviour {
 
     void Update() {
         grounded = groundDetector.IsOnGround();
+        if (grounded && !prevGrounded) audioManager.Play("footstep");
+        prevGrounded = grounded;
         frontDetected = interactDetector.DetectFront(out hitInfo);
         FindInteractType();
 
@@ -111,14 +114,15 @@ public class MotionController : MonoBehaviour {
                     if (input.moveMagnitude > 0.1) {
                         Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
                         modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.4f);
-                        audioManager.PlayIfNotPlaying("walk");
+                        //audioManager.PlayIfNotPlaying("walk");
                     } else {
-                        audioManager.Stop("walk");
+                        //audioManager.Stop("walk");
                     }
 
                     if (input.jumpPressed) {
                         jumpPending = true;
-                        audioManager.Play("jump");
+                        //audioManager.Play("jump");
+                        audioManager.Play("footstep");
                     }
                 } else {
                     audioManager.Stop("walk");
