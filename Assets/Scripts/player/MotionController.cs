@@ -157,7 +157,7 @@ public class MotionController : MonoBehaviour {
                         rb.isKinematic = true;
                         state = States.Dialogue;
                     } else if (interact == InteractType.Checkpoint) {
-                        currentCheckpoint = hitInfo.collider.GetComponent<CheckpointManager>();
+                        currentCheckpoint = hitInfo.collider.GetComponentInParent<CheckpointManager>();
                         currentCheckpoint.TriggerDialogue(dialogueManager);
                         rb.isKinematic = true;
                         state = States.Dialogue;
