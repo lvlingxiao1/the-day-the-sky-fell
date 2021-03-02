@@ -300,7 +300,7 @@ public class MotionController : MonoBehaviour {
                 if (!frontDetected) {
                     if (interactDetector.DetectLedgeBelow()) {
                         interact = InteractType.LedgeBelow;
-                        interactHintText.text = "Press F to Climb Ledge Below";
+                        //interactHintText.text = "Press F to Climb Ledge Below";
                     }
                 }
             } else {    // not on ground
