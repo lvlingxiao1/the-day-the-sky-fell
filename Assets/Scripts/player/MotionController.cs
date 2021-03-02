@@ -79,7 +79,7 @@ public class MotionController : MonoBehaviour {
         modelTransform = GameObject.Find("PlayerModel").transform;
         animator = modelTransform.GetComponent<Animator>();
 
-        debugText = GameObject.Find("debugText").GetComponent<Text>();
+        //debugText = GameObject.Find("debugText").GetComponent<Text>();
         hangCollider = GameObject.Find("HangCollider").GetComponent<BoxCollider>();
         grabArmCollider = GameObject.Find("GrabArmCollider").GetComponent<BoxCollider>();
         interactHintText = GameObject.Find("InteractHint").GetComponent<Text>();
@@ -219,7 +219,7 @@ public class MotionController : MonoBehaviour {
             currentCheckpoint.Respawn(this, dialogueManager);
         }
 
-        debugText.text = $"{state} {rb.velocity}";
+        //debugText.text = $"{state} {rb.velocity}";
     }
 
     private void FixedUpdate() {

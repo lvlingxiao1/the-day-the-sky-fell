@@ -24,7 +24,7 @@ public class LedgeDetector {
     public LedgeDetector(Transform playerTransform, Transform modelTransform) {
         this.playerTransform = playerTransform;
         this.modelTransform = modelTransform;
-        debugText = GameObject.Find("debugText").GetComponent<Text>();
+        //debugText = GameObject.Find("debugText").GetComponent<Text>();
         //hangOffsetZ = playerTransform.GetComponent<CapsuleCollider>().radius;
     }
 
