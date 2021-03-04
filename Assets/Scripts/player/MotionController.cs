@@ -18,6 +18,7 @@ public class MotionController : MonoBehaviour {
 
     // attributes
     public bool grounded;
+    Vector3 jumpInitVelocity;
     bool prevGrounded = true;
     bool frontDetected;
     float speedFactor;
@@ -125,7 +126,11 @@ public class MotionController : MonoBehaviour {
                         audioManager.Play("footstep");
                     }
                 } else {
-                    audioManager.Stop("walk");
+                    //audioManager.Stop("walk");
+                    if (input.moveMagnitude > 0.1) {
+                        Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
+                        modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.1f);
+                    }
                     if (input.grabBtnDown) {
                         animator.SetBool("on_ledge", true);
                         hangCollider.enabled = true;
@@ -232,8 +237,13 @@ public class MotionController : MonoBehaviour {
                     if (jumpPending) {
                         newVelocity.y += jumpSpeed;
                         jumpPending = false;
+                        jumpInitVelocity = newVelocity * 0.5f;
                     }
                     rb.velocity = newVelocity;
+                } else {
+                    newVelocity = jumpInitVelocity + 0.5f * forwardSpeed * input.moveMagnitude * modelTransform.forward * speedFactor;
+                    newVelocity.y = rb.velocity.y;
+                    rb.velocity = Vector3.Lerp(rb.velocity, newVelocity, 0.1f);
                 }
                 break;
             case States.OnLadder:
