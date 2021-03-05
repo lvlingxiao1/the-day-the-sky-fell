@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Climbing;
+using TMPro;
 
 public class MotionController : MonoBehaviour {
     public float forwardSpeed = 5f;
@@ -10,6 +11,9 @@ public class MotionController : MonoBehaviour {
     public float interactDetectDistance = 1.0f;
     public float ledgeSpeed = 3f;
     public float climbGridSpeed = 3f;
+    public int livesMax = 1;
+    public int lives = 1;
+    public Vector3 lastSafePosition;
 
     public string defaultCheckpoint;
 
@@ -18,7 +22,6 @@ public class MotionController : MonoBehaviour {
 
     // attributes
     public bool grounded;
-    Vector3 jumpInitVelocity;
     bool prevGrounded = true;
     bool frontDetected;
     float speedFactor;
@@ -80,7 +83,7 @@ public class MotionController : MonoBehaviour {
         modelTransform = GameObject.Find("PlayerModel").transform;
         animator = modelTransform.GetComponent<Animator>();
 
-        //debugText = GameObject.Find("debugText").GetComponent<Text>();
+        debugText = GameObject.Find("debugText").GetComponent<Text>();
         hangCollider = GameObject.Find("HangCollider").GetComponent<BoxCollider>();
         grabArmCollider = GameObject.Find("GrabArmCollider").GetComponent<BoxCollider>();
         interactHintText = GameObject.Find("InteractHint").GetComponent<Text>();
@@ -94,6 +97,7 @@ public class MotionController : MonoBehaviour {
         dialogueManager = FindObjectOfType<DialogueManager>();
 
         currentCheckpoint = GameObject.Find(defaultCheckpoint).GetComponent<CheckpointManager>();
+        GameObject.Find("LivesText").GetComponent<TextMeshProUGUI>().text = $"Drinks: {lives}";
     }
 
     void Update() {
@@ -106,6 +110,7 @@ public class MotionController : MonoBehaviour {
         switch (state) {
             case States.Normal:
                 if (grounded) {
+                    lastSafePosition = transform.position;
                     if (input.slowBtnHold) {
                         speedFactor = Mathf.Lerp(speedFactor, 1, 0.3f);
                     } else {
@@ -135,7 +140,7 @@ public class MotionController : MonoBehaviour {
                         animator.SetBool("on_ledge", true);
                         hangCollider.enabled = true;
                         grabArmCollider.enabled = true;
-                        grabStuckSecondChance = 1;  // velocity becomes 0 once when jumping up 
+                        grabStuckSecondChance = 5;  // velocity becomes 0 once when jumping up 
                         state = States.Grab;
                     }
                 }
@@ -166,6 +171,8 @@ public class MotionController : MonoBehaviour {
                         currentCheckpoint.TriggerDialogue(dialogueManager);
                         rb.isKinematic = true;
                         state = States.Dialogue;
+                        lives = livesMax;
+                        GameObject.Find("LivesText").GetComponent<TextMeshProUGUI>().text = $"Drinks: {lives}";
                     }
                 }
 
@@ -224,7 +231,7 @@ public class MotionController : MonoBehaviour {
             currentCheckpoint.Respawn(this, dialogueManager);
         }
 
-        //debugText.text = $"{state} {rb.velocity}";
+        debugText.text = $"{state} {rb.velocity}";
     }
 
     private void FixedUpdate() {
@@ -237,13 +244,14 @@ public class MotionController : MonoBehaviour {
                     if (jumpPending) {
                         newVelocity.y += jumpSpeed;
                         jumpPending = false;
-                        jumpInitVelocity = newVelocity * 0.5f;
                     }
                     rb.velocity = newVelocity;
                 } else {
-                    newVelocity = jumpInitVelocity + 0.5f * forwardSpeed * input.moveMagnitude * modelTransform.forward * speedFactor;
-                    newVelocity.y = rb.velocity.y;
-                    rb.velocity = Vector3.Lerp(rb.velocity, newVelocity, 0.1f);
+                    if (input.moveMagnitude > 0.1) {
+                        newVelocity = forwardSpeed * input.moveMagnitude * modelTransform.forward * speedFactor;
+                        newVelocity.y = rb.velocity.y;
+                        rb.velocity = Vector3.Lerp(rb.velocity, newVelocity, 0.1f);
+                    }
                 }
                 break;
             case States.OnLadder:
@@ -254,10 +262,10 @@ public class MotionController : MonoBehaviour {
                 break;
 
             case States.Grab:
-                if (Mathf.Abs(rb.velocity.y) < 1e-4) {
-                    if (ledgeDetector.AdjustFacingToLedge())
+                if (Mathf.Abs(rb.velocity.y) < 5e-4) {
+                    if (ledgeDetector.AdjustFacingToLedge()) {
                         state = States.GrabStable;
-                    else if (grabStuckSecondChance > 0) {
+                    } else if (grabStuckSecondChance > 0) {
                         grabStuckSecondChance--;
                     } else {
                         SetStateNormal();

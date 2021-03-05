@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class CheckpointManager : MonoBehaviour {
     public Vector3 respawnPositionOffset;
@@ -26,8 +27,15 @@ public class CheckpointManager : MonoBehaviour {
 
     private IEnumerator respawnCoroutine(MotionController controller) {
         yield return new WaitForSeconds(0.9f);
-        controller.transform.position = respawnPosition;
-        controller.modelTransform.eulerAngles = respawnRotation;
+        if (controller.lives > 0) {
+            controller.lives--;
+            controller.transform.position = controller.lastSafePosition;
+        } else {
+            controller.lives = controller.livesMax;
+            controller.transform.position = respawnPosition;
+            controller.modelTransform.eulerAngles = respawnRotation;
+        }
+        GameObject.Find("LivesText").GetComponent<TextMeshProUGUI>().text = $"Drinks: {controller.lives}";
         controller.SetStateNormal();
         CameraController cameraController = FindObjectOfType<CameraController>();
         cameraController.ResetCamera(respawnRotation);

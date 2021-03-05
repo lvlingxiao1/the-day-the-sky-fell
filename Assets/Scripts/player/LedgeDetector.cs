@@ -25,7 +25,6 @@ public class LedgeDetector {
         this.playerTransform = playerTransform;
         this.modelTransform = modelTransform;
         //debugText = GameObject.Find("debugText").GetComponent<Text>();
-        //hangOffsetZ = playerTransform.GetComponent<CapsuleCollider>().radius;
     }
 
     public void EnterLedge() {
@@ -58,8 +57,8 @@ public class LedgeDetector {
         newPos.y = playerTransform.position.y;
         Vector3 newForward = -hitInfo.normal;
         newForward.y = 0;
-        playerTransform.position = newPos;
-        modelTransform.forward = newForward;
+        playerTransform.position = Vector3.Lerp(playerTransform.position, newPos, 0.3f);
+        modelTransform.forward = Vector3.Slerp(modelTransform.forward, newForward, 0.3f);
         return true;
     }
 
