@@ -16,19 +16,17 @@ public class DialogueManager : MonoBehaviour {
     private string prevAudio = "";
 
     // caption variables
-    public Image caption;
     private TextMeshProUGUI captionText;
     private int displayingCaption = 0;
 
     private void Awake() {
         audioManager = FindObjectOfType<AudioManager>();
-        caption.enabled = false;
-        captionText = caption.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-        captionText.text = "";
+        captionText = GameObject.Find("CaptionText").GetComponent<TextMeshProUGUI>();
+        captionText.enabled = false;
     }
 
     public void StartDialogue(Sentence[] dialogue) {
-        removeCaptionInstant();
+        RemoveCaptionInstant();
         dialogueAnimator.SetBool("isOpen", true);
 
         index = 0;
@@ -78,40 +76,35 @@ public class DialogueManager : MonoBehaviour {
         blackScreenAnimator.SetTrigger("start");
     }
 
-    public void displayCaption(string[] captionComments, string sfx) {
+    public void DisplayCaption(string[] captionComments, string sfx) {
         displayingCaption++;
         int index = Random.Range(0, captionComments.Length);
-        caption.enabled = true;
         captionText.text = captionComments[index];
+        captionText.enabled = true;
         audioManager.Play(sfx);
-
-        Color temp = caption.color;
-        temp.a = 0.45f;
-        caption.color = temp;
     }
 
-    public void removeCaption() {
+    public void RemoveCaption() {
         displayingCaption--;
         if (displayingCaption == 0) {
-            captionText.text = "";
             StartCoroutine(FadeOut());
         }
     }
 
-    public void removeCaptionInstant() {
+    public void RemoveCaptionInstant() {
         displayingCaption = 0;
         captionText.text = "";
-        caption.enabled = false;
     }
 
-    IEnumerator FadeOut () {
-        while (caption.color.a > 0) {
-            Color temp = caption.color;
-            temp.a -= Time.deltaTime / 2;
-            caption.color = temp;
+    IEnumerator FadeOut() {
+        Color currentColour = captionText.color;
+        Color originalColour = currentColour;
+        while (captionText.color.a > 0.001) {
+            currentColour.a = Mathf.Lerp(currentColour.a, 0, 0.2f);
+            captionText.color = currentColour;
             yield return null;
         }
-        caption.enabled = false;
-        yield return null;
+        captionText.enabled = false;
+        captionText.color = originalColour;
     }
 }
