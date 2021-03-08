@@ -7,7 +7,6 @@ TagManager:
   - ladder
   - DialogueTrigger
   - checkpoint
-  - VendingMachineCaption
   layers:
   - Default
   - TransparentFX
