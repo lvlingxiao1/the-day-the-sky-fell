@@ -9,12 +9,8 @@ public class CaptionDetector : MonoBehaviour
     public TextMeshProUGUI captionText;
     public Image caption;
     public int displaying;
-
-    List<string> vendingMachine = new List<string>
-            { "I just realized... this might be the last Cola I ever drink",
-            "Looks like I can take a break here.",
-            "Goodbye tooth rotting drink. May I never get another cavity."
-            };
+    public string[] captionDialogue;
+    private bool firstTime;
 
     // Start is called before the first frame update
     void Start()
@@ -22,15 +18,16 @@ public class CaptionDetector : MonoBehaviour
         caption.enabled = false;
         captionText.text = "";
         displaying = 0;
+        firstTime = true;
     }
 
     IEnumerator OnTriggerEnter(Collider col) {
-        if (col.tag == "VendingMachineCaption") {
+        if (col.tag == "Player" && firstTime) {
+            firstTime = false;
             displaying++;
-            Destroy(col);
-            int index = Random.Range(0, vendingMachine.Count);
+            int index = Random.Range(0, captionDialogue.Length);
             caption.enabled = true;
-            captionText.text = vendingMachine[index];
+            captionText.text = captionDialogue[index];
 
             Color temp = caption.color;
             temp.a = 0.45f;
