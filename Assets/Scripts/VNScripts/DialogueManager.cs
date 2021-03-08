@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class DialogueManager : MonoBehaviour {
     public Text nameText;
@@ -9,13 +10,22 @@ public class DialogueManager : MonoBehaviour {
     public Image speakerSprite;
     public Animator dialogueAnimator;
     public Animator blackScreenAnimator;
+
     private Sentence[] dialogue;
     private int index;
     private AudioManager audioManager;
     private string prevAudio = "";
 
+    // caption variables
+    public Image caption;
+    private TextMeshProUGUI captionText;
+    private int displayingCaption = 0;
+
     private void Awake() {
         audioManager = FindObjectOfType<AudioManager>();
+        caption.enabled = false;
+        captionText = caption.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        captionText.text = "";
     }
 
     public void StartDialogue(Sentence[] dialogue) {
@@ -66,5 +76,36 @@ public class DialogueManager : MonoBehaviour {
 
     public void BlackScreen() {
         blackScreenAnimator.SetTrigger("start");
+    }
+
+    public void displayCaption(string[] captionComments, string sfx) {
+        displayingCaption++;
+        int index = Random.Range(0, captionComments.Length);
+        caption.enabled = true;
+        captionText.text = captionComments[index];
+        audioManager.Play(sfx);
+
+        Color temp = caption.color;
+        temp.a = 0.45f;
+        caption.color = temp;
+    }
+
+    public void removeCaption() {
+        displayingCaption--;
+        if (displayingCaption == 0) {
+            captionText.text = "";
+            StartCoroutine(FadeOut());
+        }
+    }
+
+    IEnumerator FadeOut () {
+        while (caption.color.a > 0) {
+            Color temp = caption.color;
+            temp.a -= Time.deltaTime / 2;
+            caption.color = temp;
+            yield return null;
+        }
+        caption.enabled = false;
+        yield return null;
     }
 }
