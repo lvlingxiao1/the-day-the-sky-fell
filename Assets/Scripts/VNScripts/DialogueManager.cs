@@ -10,7 +10,6 @@ public class DialogueManager : MonoBehaviour {
     public Image speakerSprite;
     public Animator dialogueAnimator;
     public Animator blackScreenAnimator;
-
     private Sentence[] dialogue;
     private int index;
     private AudioManager audioManager;
@@ -29,6 +28,7 @@ public class DialogueManager : MonoBehaviour {
     }
 
     public void StartDialogue(Sentence[] dialogue) {
+        removeCaptionInstant();
         dialogueAnimator.SetBool("isOpen", true);
 
         index = 0;
@@ -96,6 +96,12 @@ public class DialogueManager : MonoBehaviour {
             captionText.text = "";
             StartCoroutine(FadeOut());
         }
+    }
+
+    public void removeCaptionInstant() {
+        displayingCaption = 0;
+        captionText.text = "";
+        caption.enabled = false;
     }
 
     IEnumerator FadeOut () {
