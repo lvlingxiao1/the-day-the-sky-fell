@@ -6,40 +6,46 @@ using UnityEngine.UI;
 
 public class CaptionDetector : MonoBehaviour
 {
-    public TextMeshProUGUI captionText;
     public Image caption;
-    public int displaying;
-    public string[] captionDialogue;
+    public string[] captionComments;
+    public string sfx;
     private bool firstTime;
+    private AudioManager audioManager;
+    private TextMeshProUGUI captionText;
+
+    private void Awake() {
+        audioManager = FindObjectOfType<AudioManager>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         caption.enabled = false;
+        captionText = caption.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         captionText.text = "";
-        displaying = 0;
         firstTime = true;
     }
 
     IEnumerator OnTriggerEnter(Collider col) {
-        if (col.tag == "Player" && firstTime) {
+
+        displayCaption(col.tag);
+
+        yield return new WaitForSeconds(3);
+
+        removeCaption();
+    }
+
+    public void displayCaption(string tag) {
+        if (tag == "Player" && firstTime) {
             firstTime = false;
-            displaying++;
-            int index = Random.Range(0, captionDialogue.Length);
+            int index = Random.Range(0, captionComments.Length);
             caption.enabled = true;
-            captionText.text = captionDialogue[index];
+            captionText.text = captionComments[index];
+            audioManager.Play(sfx);
 
             Color temp = caption.color;
             temp.a = 0.45f;
             caption.color = temp;
-        }
-
-
-        yield return new WaitForSeconds(3);
-        displaying--;
-
-        if (displaying == 0) {
-            removeCaption();
         }
     }
 
