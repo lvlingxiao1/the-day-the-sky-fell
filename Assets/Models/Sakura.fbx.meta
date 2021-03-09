@@ -3,7 +3,32 @@ guid: 2b3b921b130ca35449984f2bec389142
 ModelImporter:
   serializedVersion: 19301
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 01 - Default2
+    second: {fileID: 2100000, guid: c44760df298ab31489f7ca0a25dbffb0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: defaultMat1
+    second: {fileID: 2100000, guid: 1f54249323d224740afb4fea3915850b, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: SakuraDiffuse1
+    second: {fileID: 2800000, guid: 51adc7c92de52ce48b227375acabafab, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: SakuraNormals1
+    second: {fileID: 2800000, guid: 42df6e491f0494849af5938699468630, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: TrunkHigh
+    second: {fileID: 2800000, guid: e0aae8534f54c5d4ca9ad04582794397, type: 3}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -62,7 +87,7 @@ ModelImporter:
     useFileScale: 1
   tangentSpace:
     normalSmoothAngle: 60
-    normalImportMode: 1
+    normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
