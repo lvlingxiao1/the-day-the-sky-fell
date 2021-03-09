@@ -30,10 +30,13 @@ public class CheckpointManager : MonoBehaviour {
         if (controller.lives > 0) {
             controller.lives--;
             controller.transform.position = controller.lastSafePosition;
+            Vector3 angles = controller.modelTransform.eulerAngles;
+            angles.y += 180;
+            controller.modelTransform.eulerAngles = angles;
         } else {
             controller.lives = controller.livesMax;
             controller.transform.position = respawnPosition;
-            controller.modelTransform.eulerAngles = respawnRotation;
+            controller.modelTransform.forward = -controller.transform.forward; ;
         }
         GameObject.Find("LivesText").GetComponent<TextMeshProUGUI>().text = $"Drinks: {controller.lives}";
         controller.SetStateNormal();

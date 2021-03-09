@@ -14,7 +14,7 @@ public class LedgeDetector {
     readonly Vector3 adjustFacingPoint1 = new Vector3(0f, 2f, -0.2f);
     readonly Vector3 adjustFacingPoint2 = new Vector3(-0.4f, 2.1f, -0.2f);
     readonly Vector3 adjustFacingPoint3 = new Vector3(0.4f, 2.1f, -0.2f);
-    readonly float adjustDetectDistance = 0.7f;
+    readonly float adjustDetectDistance = 1.2f;
     private RaycastHit hitInfo;
 
     private Vector3 canMoveRightColliderPos = new Vector3(0.362f, 2.11f, 0.311f);

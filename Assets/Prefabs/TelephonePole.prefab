@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4093578838770924546}
   - component: {fileID: 1108039262373163943}
   - component: {fileID: 2919595482074367853}
+  - component: {fileID: 3717627933920363446}
   m_Layer: 8
   m_Name: TelephonePole
   m_TagString: Untagged
@@ -26,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3712233758897694392}
   m_LocalRotation: {x: -0, y: 0, z: 1, w: 0}
-  m_LocalPosition: {x: 8.358251, y: 0.24534474, z: -3.1260002}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.31146, y: 0.831418, z: 0.31146}
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,3 +81,16 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!65 &3717627933920363446
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3712233758897694392}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.23192646, y: 4.3548346, z: 0.23257692}
+  m_Center: {x: -0.00065117335, y: -0.14278887, z: 0}
