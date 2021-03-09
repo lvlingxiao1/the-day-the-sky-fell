@@ -6,6 +6,11 @@ public class CaptionDetector : MonoBehaviour {
     public string[] captionComments;
     public string sfx;
     public float numTriggers = Mathf.Infinity;
+    private float initialTriggers;
+
+    private void Awake() {
+        initialTriggers = numTriggers;
+    }
 
     IEnumerator OnTriggerEnter(Collider col) {
         if (numTriggers > 0 && col.CompareTag("Player")) {
@@ -15,5 +20,9 @@ public class CaptionDetector : MonoBehaviour {
             yield return new WaitForSeconds(3);
             manager.RemoveCaption();
         }
+    }
+
+    public void ResetTriggers() {
+        numTriggers = initialTriggers;
     }
 }

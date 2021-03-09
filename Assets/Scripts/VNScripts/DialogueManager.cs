@@ -86,7 +86,7 @@ public class DialogueManager : MonoBehaviour {
 
     public void RemoveCaption() {
         displayingCaption--;
-        if (displayingCaption == 0) {
+        if (displayingCaption <= 0) {
             StartCoroutine(FadeOut());
         }
     }
@@ -97,6 +97,7 @@ public class DialogueManager : MonoBehaviour {
     }
 
     IEnumerator FadeOut() {
+        displayingCaption = 0;
         Color currentColour = captionText.color;
         Color originalColour = currentColour;
         while (captionText.color.a > 0.001) {

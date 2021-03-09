@@ -39,6 +39,7 @@ public class CheckpointManager : MonoBehaviour {
         controller.SetStateNormal();
         CameraController cameraController = FindObjectOfType<CameraController>();
         cameraController.ResetCamera(respawnRotation);
+        FindObjectOfType<CaptionDetector>().ResetTriggers();
         handled = false;
     }
 
