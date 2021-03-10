@@ -6,7 +6,7 @@ using TMPro;
 public class CheckpointManager : MonoBehaviour {
     public Vector3 respawnPositionOffset;
     private Sentence[] checkpointMessage = {
-        new Sentence("", "Stamina recovered", null, "vending machine")
+        new Sentence("", "Drinks replenished", null, "vending machine")
     };
     private Vector3 respawnPosition;
     private Vector3 respawnRotation;
