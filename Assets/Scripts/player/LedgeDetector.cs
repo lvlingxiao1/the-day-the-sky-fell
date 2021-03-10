@@ -4,17 +4,17 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class LedgeDetector {
-    Vector3 entryDetectOrigin = new Vector3(0, -0.3f, 1);
+    Vector3 entryDetectOrigin = new Vector3(0, -0.1f, 1);
     readonly int environment = LayerMask.GetMask("environment");
     readonly Transform playerTransform;
     readonly Transform modelTransform;
     readonly Text debugText;
-    public readonly float hangOffsetY = -2.224f;
-    public readonly float hangOffsetZ = 0.258f;
+    readonly float hangOffsetY = -2.2f;
+    readonly float hangOffsetZ = 0.258f;
     readonly Vector3 adjustFacingPoint1 = new Vector3(0f, 2f, -0.2f);
     readonly Vector3 adjustFacingPoint2 = new Vector3(-0.4f, 2.1f, -0.2f);
     readonly Vector3 adjustFacingPoint3 = new Vector3(0.4f, 2.1f, -0.2f);
-    readonly float adjustDetectDistance = 1.2f;
+    readonly float adjustDetectDistance = 1.7f;
     private RaycastHit hitInfo;
 
     private Vector3 canMoveRightColliderPos = new Vector3(0.362f, 2.11f, 0.311f);
@@ -27,19 +27,23 @@ public class LedgeDetector {
         //debugText = GameObject.Find("debugText").GetComponent<Text>();
     }
 
-    public void EnterLedge() {
-        bool hit = Physics.Raycast(playerTransform.position + modelTransform.rotation * entryDetectOrigin,
-            modelTransform.rotation * Vector3.back, out RaycastHit hitInfo, 1f, environment);
-        if (!hit) {
-            Debug.Log("Cannot climb the ledge below"); return;
+    public bool EnterLedge() {
+        if (!Physics.Raycast(playerTransform.position + modelTransform.rotation * entryDetectOrigin,
+            -modelTransform.forward, out RaycastHit hitInfo, 1.5f, environment)) {
+            //Debug.Log("Cannot climb the ledge below");
+            return false;
         }
-        Vector3 newPos = hitInfo.point + hitInfo.normal * hangOffsetZ;
-        newPos.y = playerTransform.position.y + hangOffsetY;
+        Debug.Log(hitInfo.point);
         Vector3 newForward = -hitInfo.normal;
         newForward.y = 0;
-        newForward.Normalize();
-        playerTransform.position = newPos;
         modelTransform.forward = newForward;
+        playerTransform.position = hitInfo.point + hitInfo.normal * hangOffsetZ + Vector3.up * (hangOffsetY + 0.1f);
+        //Debug.Log(playerTransform.position);
+        return true;
+    }
+
+    public void ClimbUpLedge() {
+        playerTransform.position += modelTransform.rotation * new Vector3(0, -hangOffsetY, hangOffsetZ * 2);
     }
 
     public bool AdjustFacingToLedge() {

@@ -59,4 +59,10 @@ public class PlayerInput : MonoBehaviour {
 
         moveMagnitude = Mathf.Sqrt(goingForward * goingForward + goingRight * goingRight);
     }
+
+    public IEnumerator LockInputForSeconds(float seconds) {
+        inputEnabled = false;
+        yield return new WaitForSeconds(seconds);
+        inputEnabled = true;
+    }
 }

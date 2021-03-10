@@ -36,6 +36,7 @@ public class InteractDetector {
 
     public bool DetectLedgeBelow() {
         Debug.DrawRay(playerTransform.position + modelTransform.rotation * downOffset, Vector3.down * downDistance, new Color(0, 1, 0));
+        Debug.DrawRay(playerTransform.position + modelTransform.rotation * new Vector3(0, -0.1f, 1), -modelTransform.forward * 1.5f, new Color(0, 1, 0));
         if (!Physics.Raycast(playerTransform.position + modelTransform.rotation * downOffset, Vector3.down, downDistance)) {
             return true;
         }
