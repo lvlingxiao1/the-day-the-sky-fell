@@ -16,6 +16,7 @@ public class CheckpointManager : MonoBehaviour {
         respawnPosition = transform.position + transform.rotation * respawnPositionOffset;
         respawnRotation = transform.eulerAngles;
         respawnRotation.y += 180;
+        respawnRotation.z = 0;
     }
 
     public void Respawn(MotionController controller, DialogueManager dialogueManager) {
