@@ -12,8 +12,8 @@ public class CameraController : MonoBehaviour {
     PlayerInput input;
     Vector3 defaultLocalPosition;
     Vector3 defaultRotation;
-    Vector3 targetLocalPosition;
-    Vector3 targetRotation;
+    public Vector3 targetLocalPosition;
+    public Vector3 targetRotation;
     Vector3 nextRotation;
     float localDistance;
     int environment;

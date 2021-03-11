@@ -19,7 +19,7 @@ public class MotionController : MonoBehaviour {
 
     // user inputs
     bool jumpPending = false;
-    bool jumped = false;
+    bool autoClimbDown = false;
 
     // attributes
     public bool grounded;
@@ -104,7 +104,7 @@ public class MotionController : MonoBehaviour {
         grounded = groundDetector.IsOnGround();
         if (grounded && !prevGrounded) {
             audioManager.Play("footstep");
-            jumped = false;
+            autoClimbDown = true;
         }
         prevGrounded = grounded;
 
@@ -114,10 +114,12 @@ public class MotionController : MonoBehaviour {
             case States.Normal:
                 if (grounded) {
                     lastSafePosition = transform.position;
-                    if (input.slowBtnHold) {
-                        speedFactor = Mathf.Lerp(speedFactor, 1, 0.3f);
+                    if (input.runBtnHold) {
+                        speedFactor = Mathf.Lerp(speedFactor, 1.5f, 0.3f);
+                        autoClimbDown = false;
                     } else {
-                        speedFactor = Mathf.Lerp(speedFactor, 2, 0.3f);
+                        speedFactor = Mathf.Lerp(speedFactor, 1, 0.3f);
+                        autoClimbDown = true;
                     }
 
                     if (input.moveMagnitude > 0.1) {
@@ -134,19 +136,19 @@ public class MotionController : MonoBehaviour {
                         if (ledgeDetector.EnterLedge()) {
                             SetStateGrab();
                             rb.velocity = new Vector3(0, 0, 0);
-                            camera.ResetCamera(modelTransform.eulerAngles);
-                            StartCoroutine(input.LockInputForSeconds(0.5f));
+                            camera.targetRotation.x = 70;
+                            StartCoroutine(input.LockInputForSeconds(0.7f));
                             break;
                         }
                     }
                 } else {
                     //audioManager.Stop("walk");
-                    if (!jumped && interact == InteractType.LedgeBelow) {
+                    if (autoClimbDown && interact == InteractType.LedgeBelow) {
                         if (ledgeDetector.EnterLedge()) {
                             SetStateGrab();
                             rb.velocity = new Vector3(0, 0, 0);
-                            camera.ResetCamera(modelTransform.eulerAngles);
-                            StartCoroutine(input.LockInputForSeconds(0.5f));
+                            camera.targetRotation.x = 70;
+                            StartCoroutine(input.LockInputForSeconds(0.7f));
                             break;
                         }
                     }
@@ -208,6 +210,11 @@ public class MotionController : MonoBehaviour {
                     break;
                 }
                 ledgeDetector.AdjustFacingToLedge();
+                if (input.runBtnHold) {
+                    speedFactor = Mathf.Lerp(speedFactor, 1.2f, 0.3f);
+                } else {
+                    speedFactor = Mathf.Lerp(speedFactor, 1, 0.3f);
+                }
                 if (input.goingForward > 0) {  // teleport up
                     ledgeDetector.ClimbUpLedge();
                     SetStateNormal();
@@ -215,14 +222,14 @@ public class MotionController : MonoBehaviour {
                 } else if (input.releaseBtnDown || input.goingForward < 0) {
                     SetStateNormal();
                 }
-                animator.SetFloat("ledge_speed", input.goingRight);
+                animator.SetFloat("ledge_speed", input.goingRight * speedFactor);
                 break;
 
             case States.OnClimbGrid:
-                if (input.slowBtnHold) {
-                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed, 0.3f);
+                if (input.runBtnHold) {
+                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 1.5f, 0.3f);
                 } else {
-                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 2, 0.3f);
+                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed, 0.3f);
                 }
                 break;
 
@@ -256,7 +263,7 @@ public class MotionController : MonoBehaviour {
                     if (jumpPending) {
                         newVelocity.y += jumpSpeed;
                         jumpPending = false;
-                        jumped = true;
+                        autoClimbDown = false;
                     }
                     rb.velocity = newVelocity;
                 } else {
@@ -279,7 +286,7 @@ public class MotionController : MonoBehaviour {
                     if (ledgeDetector.AdjustFacingToLedge()) {
                         state = States.GrabStable;
                         StartCoroutine(input.LockInputForSeconds(0.3f));
-                        jumped = false;
+                        autoClimbDown = true;
                     } else if (grabStuckSecondChance > 0) {
                         grabStuckSecondChance--;
                     } else {
@@ -293,7 +300,7 @@ public class MotionController : MonoBehaviour {
             case States.GrabStable:
                 if ((input.goingRight > 0 && ledgeDetector.CanMoveRight())
                     || (input.goingRight < 0 && ledgeDetector.CanMoveLeft())) {
-                    newVelocity = ledgeSpeed * input.goingRight * modelTransform.right;
+                    newVelocity = ledgeSpeed * input.goingRight * modelTransform.right * speedFactor;
                 } else {
                     newVelocity = Vector3.zero;
                 }

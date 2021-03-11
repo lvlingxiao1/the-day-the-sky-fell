@@ -473,7 +473,7 @@ GameObject:
   - component: {fileID: 6784608969278267962}
   - component: {fileID: 8123306613788601985}
   - component: {fileID: 2025463606864004768}
-  - component: {fileID: 7407267655749180302}
+  - component: {fileID: 1815530991667440340}
   - component: {fileID: 4814382620854184128}
   m_Layer: 8
   m_Name: CaptionDetector
@@ -543,8 +543,8 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!136 &7407267655749180302
-CapsuleCollider:
+--- !u!135 &1815530991667440340
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -553,10 +553,9 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
+  serializedVersion: 2
   m_Radius: 1.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &4814382620854184128
 MonoBehaviour:
   m_ObjectHideFlags: 0
