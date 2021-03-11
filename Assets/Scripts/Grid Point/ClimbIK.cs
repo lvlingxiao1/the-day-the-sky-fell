@@ -7,6 +7,7 @@ namespace Climbing
     public class ClimbIK : MonoBehaviour
     {
         Animator anim;
+        Transform modelTransform;
 
         Point lhPoint;
         Point rhPoint;
@@ -40,6 +41,7 @@ namespace Climbing
         // Start is called before the first frame update
         void Start()
         {
+            modelTransform = GameObject.Find("PlayerModel").transform;
             anim = GetComponent<Animator>();
             hips = anim.GetBoneTransform(HumanBodyBones.Hips);
 
@@ -326,8 +328,12 @@ namespace Climbing
                         anim.GetBoneTransform(HumanBodyBones.LeftShoulder) :
                         anim.GetBoneTransform(HumanBodyBones.RightShoulder);
 
+                    // relative offset
+                    Vector3 offset = modelTransform.forward + Vector3.up / 2;
+
                     // [TUNE] Rotate hand to align with should so that the gesture is more natural, can be tuned
-                    Vector3 targetRotationDirection = shoulder.transform.position - ikHelper.transform.position;
+                    Vector3 targetRotationDirection = shoulder.transform.position - (ikHelper.transform.position + offset);
+
                     Quaternion targetRotation = Quaternion.LookRotation(-targetRotationDirection);
                     ikHelper.rotation = targetRotation;
                 }

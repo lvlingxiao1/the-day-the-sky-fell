@@ -51,6 +51,9 @@ namespace Climbing
         float _time;
         bool initTransit;
         bool rootReached;
+
+        float ikStartWeight;
+        float ikEndWeight;
         #endregion
 
         // IK debug variables. Defined but not used
@@ -63,7 +66,8 @@ namespace Climbing
         Vector3 targetPosition;
         
         // For coping with animation that is not root at the character's hip
-        public Vector3 rootOffset = new Vector3(0, -0.86f, 0);
+        public Vector3 climbRootOffset = new Vector3(0, -0.86f, 0);
+        public Vector3 hangRootOffset = new Vector3(0, -1.19f, 0);
         public float speed_linear = 3f;
         public float speed_leap = 2f;
 
@@ -262,6 +266,9 @@ namespace Climbing
             {
                 if (moveDirection == targetPoint.ReturnNeighbor(previousPoint).direction)
                 {
+                    float tempStartWeight = ikStartWeight;
+                    ikStartWeight = ikEndWeight;
+                    ikEndWeight = tempStartWeight;
                     targetPoint = previousPoint;
                 }
                 else if (moveDirection == previousPoint.ReturnNeighbor(targetPoint).direction)
@@ -278,7 +285,7 @@ namespace Climbing
                 targetPoint = currentPoint;
             }
 
-            targetPosition = targetPoint.transform.position + rootOffset;
+            targetPosition = targetPoint.transform.position + (targetPoint.climbPosition == ClimbPosition.climbing ? climbRootOffset : (hangRootOffset + modelTransform.forward * 0.15f));
             climbState = ClimbStates.inTransition;
             targetState = ClimbStates.onPoint;
             previousPoint = currentPoint;
@@ -298,7 +305,7 @@ namespace Climbing
                 case ConnectionType.inBetween:
                     // mid point
                     float distance = Vector3.Distance(currentPoint.transform.position, targetPoint.transform.position);
-                    desiredPosition = currentPoint.transform.position + (direction * (distance / 2)) + rootOffset;
+                    desiredPosition = currentPoint.transform.position + (direction * (distance / 2)) + (currentPoint.climbPosition == ClimbPosition.climbing ? climbRootOffset : (hangRootOffset + modelTransform.forward * 0.15f));
                     targetState = ClimbStates.betweenPoints;
                     tType = GetTransitionType(moveDirection, false);
                     PlayAnimation(tType);
@@ -314,6 +321,17 @@ namespace Climbing
                     anim.SetInteger("GP_ClimbType", 20);
                     anim.SetBool("GP_Move", true);
                     break;
+            }
+
+            if (targetPoint.climbPosition == ClimbPosition.hanging)
+            {
+                ikStartWeight = 1;
+                ikEndWeight = 0;
+            }
+            else
+            {
+                ikStartWeight = 0;
+                ikEndWeight = 1;
             }
 
             targetPosition = desiredPosition;
@@ -380,7 +398,8 @@ namespace Climbing
                 ikLandSideReached = false;
                 _time = 0;
                 _startPosition = transform.position;
-                _endPosition = targetPosition + rootOffset;
+                _endPosition = targetPosition;
+
                 Vector3 directionToPoint = (_endPosition - _startPosition).normalized;
 
                 bool isMidPoint = (targetState == ClimbStates.betweenPoints);
@@ -409,7 +428,7 @@ namespace Climbing
                 rootReached = true;
             }
 
-            Vector3 currentPosition = Vector3.Lerp(_startPosition, targetPosition, _time);
+            Vector3 currentPosition = Vector3.Lerp(_startPosition, _endPosition, _time);
             transform.position = currentPosition;
 
             HandleRotation();
@@ -438,8 +457,23 @@ namespace Climbing
                 ikFollowSideReached = true;
             }
 
+            // Transition involves change of climb position (hanging <-> climbing)
+            if ((targetPoint.climbPosition != currentPoint.climbPosition) && (targetState == ClimbStates.onPoint))
+            {
+                _ikWeightLerpTime += lerpSpeed;
+                if (_ikWeightLerpTime > 1)
+                {
+                    _ikWeightLerpTime = 1;
+                }
+                float ikWeight = Mathf.Lerp(ikStartWeight, ikEndWeight, _ikWeightLerpTime);
+                anim.SetFloat("GP_IsHang", 1 - ikWeight);
+                ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, ikWeight);
+                ik.UpdateSingleIKWeight(AvatarIKGoal.LeftFoot, ikWeight);
+            }
+
             Vector3 ikWrapUpPosition = Vector3.Lerp(_ikStartPositions[1], _ikEndPositions[1], _ikWrapUpTime);
             ik.UpdateSingleTargetPosition(ikWrapUp, ikWrapUpPosition);
+
         }
         #endregion
 
@@ -456,7 +490,7 @@ namespace Climbing
                 _time = 0;
                 _rootMovementTime = 0;
                 _startPosition = transform.position;
-                _endPosition = targetPosition + rootOffset;
+                _endPosition = targetPosition + (targetPoint.climbPosition == ClimbPosition.climbing ? climbRootOffset : (hangRootOffset + modelTransform.forward * 0.15f));
 
                 bool isJumpVertical = (Mathf.Abs(moveDirection.y) > 0.1f);
                 currentCurve = isJumpVertical ? leapCurveVertical : leapCurveHorizontal;
@@ -553,6 +587,12 @@ namespace Climbing
 
         void LeapLerpFeetIK()
         {
+            if (targetPoint.climbPosition == ClimbPosition.hanging)
+            {
+                ik.UpdateSingleIKWeight(AvatarIKGoal.LeftFoot, 0);
+                ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, 0);
+            }
+
             if (isRootMovementEnbled)
                 _ikWrapUpTime += Time.deltaTime * 5;
 
@@ -584,8 +624,16 @@ namespace Climbing
             Vector3 landPosition = Vector3.Lerp(_ikStartPositions[0], _ikEndPositions[0], _ikInitiationTime);
             ik.UpdateSingleTargetPosition(ikInitiation, landPosition);
 
-            Vector3 followPosition = Vector3.Lerp(_ikStartPositions[1], _ikEndPositions[1], _ikInitiationTime);
-            ik.UpdateSingleTargetPosition(ikWrapUp, followPosition);
+            if (targetPoint.climbPosition == ClimbPosition.hanging)
+            {
+                ik.UpdateSingleIKWeight(AvatarIKGoal.LeftFoot, 0);
+                ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, 0);
+            }
+            else
+            {
+                Vector3 followPosition = Vector3.Lerp(_ikStartPositions[1], _ikEndPositions[1], _ikInitiationTime);
+                ik.UpdateSingleTargetPosition(ikWrapUp, followPosition);
+            }
         }
 
         void LeapLerpIKWrapup()
@@ -599,12 +647,20 @@ namespace Climbing
                 ikFollowSideReached = true;
             }
 
+
             Vector3 landPosition = Vector3.Lerp(_ikStartPositions[2], _ikEndPositions[2], _ikWrapUpTime);
             ik.UpdateSingleTargetPosition(ik.ReturnMirrorIKGoal(ikInitiation), landPosition);
 
-            Vector3 followPosition = Vector3.Lerp(_ikStartPositions[3], _ikEndPositions[3], _ikWrapUpTime);
-            ik.UpdateSingleTargetPosition(ik.ReturnMirrorIKGoal(ikWrapUp), followPosition);
-
+            if (targetPoint.climbPosition == ClimbPosition.hanging)
+            {
+                ik.UpdateSingleIKWeight(AvatarIKGoal.LeftFoot, 0);
+                ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, 0);
+            }
+            else
+            {
+                Vector3 followPosition = Vector3.Lerp(_ikStartPositions[3], _ikEndPositions[3], _ikWrapUpTime);
+                ik.UpdateSingleTargetPosition(ik.ReturnMirrorIKGoal(ikWrapUp), followPosition);
+            }
         }
         #endregion
 
@@ -638,13 +694,15 @@ namespace Climbing
                 ikLandSideReached = false;
                 _time = 0;
                 _startPosition = transform.position;
-                _endPosition = targetPosition + rootOffset; // 
+                _endPosition = targetPosition + (targetPoint.climbPosition == ClimbPosition.climbing ? climbRootOffset : (hangRootOffset + modelTransform.forward * 0.15f)); // 
 
                 currentCurve = mountCurve;
                 currentCurve.transform.rotation = targetPoint.transform.rotation;
                 BezierPoint[] trailPoints = currentCurve.GetAnchorPoints();
                 trailPoints[0].transform.position = _startPosition;
                 trailPoints[trailPoints.Length - 1].transform.position = _endPosition;
+
+                anim.SetFloat("GP_IsHang", targetPoint.climbPosition == ClimbPosition.climbing ? 0 : 1);
             }
 
             if (isRootMovementEnbled)
@@ -798,6 +856,23 @@ namespace Climbing
         {
             if (rootReached)
             {
+                if (isDirect)
+                {
+                    anim.SetFloat("GP_IsHang", targetPoint.climbPosition == ClimbPosition.hanging ? 1 : 0);
+                    //if ((targetPoint.climbPosition != currentPoint.climbPosition))
+                    //{
+                    //    if (targetPoint.climbPosition == ClimbPosition.hanging)
+                    //    {
+                    //        ik.UpdateSingleIKWeight(AvatarIKGoal.LeftFoot, 0);
+                    //        ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, 0);
+                    //    }
+                    //    else
+                    //    {
+                    //        ik.UpdateSingleIKWeight(AvatarIKGoal.LeftFoot, 1);
+                    //        ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, 1);
+                    //    }
+                    //}
+                }
                 if (!anim.GetBool("GP_Leap"))
                 {
                     if (!waitForWrapUp)
@@ -948,6 +1023,8 @@ namespace Climbing
         #endregion
 
         #region IK
+        float _ikWeightLerpTime;
+
         AvatarIKGoal ikInitiation; // IK component for the side which initiates the movement
         float _ikInitiationTime;
         Vector3[] _ikStartPositions = new Vector3[4];
@@ -1009,6 +1086,8 @@ namespace Climbing
             ikWrapUp = ik.ReturnFlipIKGoal(ikInitiation);
             _ikWrapUpTime = 0;
             UpdateIKTarget(1, ikWrapUp, targetPoint);
+
+            _ikWeightLerpTime = 0;
         }
 
         void InitIKDirect(Vector3 moveDirection)
@@ -1020,6 +1099,7 @@ namespace Climbing
             }
             else
             {
+                _ikWeightLerpTime = 0;
                 _ikInitiationTime = 0;
                 _ikWrapUpTime = 0;
 
@@ -1048,6 +1128,23 @@ namespace Climbing
         {
             float ikWeight = 1 - aCurve.Evaluate(curveTime);
             ik.SetAllIKWeights(ikWeight);
+
+            // Handle from climbing to hanging
+            if (targetPoint.climbPosition == ClimbPosition.hanging)
+            {
+                ik.UpdateSingleIKWeight(AvatarIKGoal.LeftFoot, 0);
+                ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, 0);
+            }
+
+            // Hanlde already on grid and from haning to climbing
+            if (currentPoint != null)
+            {
+                if ((currentPoint.climbPosition == ClimbPosition.hanging) && (targetPoint.climbPosition == ClimbPosition.climbing))
+                {
+                    ik.UpdateSingleIKWeight(AvatarIKGoal.LeftFoot, curveTime);
+                    ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, curveTime);
+                }
+            }
         }
         #endregion
     }
