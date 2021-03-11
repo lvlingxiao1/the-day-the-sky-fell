@@ -8,7 +8,6 @@ public class CameraController : MonoBehaviour {
     public float cameraSpeedMouseY = 60;
     public float cameraSpeedKeyboardX = 180;
     public float cameraSpeedKeyboardY = 60;
-    public float peakOffset;
 
     PlayerInput input;
     Vector3 defaultLocalPosition;
@@ -62,7 +61,7 @@ public class CameraController : MonoBehaviour {
         targetRotation.x = Mathf.Clamp(targetRotation.x, -40, 70);
         transform.eulerAngles = targetRotation;
 
-        targetLocalPosition = defaultLocalPosition + Vector3.right * peakOffset * input.peakRight;
+        targetLocalPosition = defaultLocalPosition;
 
         collissionTest();
 

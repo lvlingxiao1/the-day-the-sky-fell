@@ -7,7 +7,6 @@ public class PlayerInput : MonoBehaviour {
 
     [HideInInspector] public float goingForward;
     [HideInInspector] public float goingRight;
-    [HideInInspector] public float peakRight;
     [HideInInspector] public float cameraHorizontal;
     [HideInInspector] public float cameraVertical;
     [HideInInspector] public bool jumpPressed;
@@ -34,7 +33,6 @@ public class PlayerInput : MonoBehaviour {
         mouseMoveY = Input.GetAxis("Mouse Y");
         cameraHorizontal = Input.GetAxis("CameraHorizontal");
         cameraVertical = Input.GetAxis("CameraVertical");
-        peakRight = Input.GetAxis("Peak");
 
         if (inputEnabled) {
             verticleInputRaw = Input.GetAxis("Vertical");
