@@ -215,6 +215,7 @@ public class MotionController : MonoBehaviour {
                 } else if (input.releaseBtnDown || input.goingForward < 0) {
                     SetStateNormal();
                 }
+                animator.SetFloat("ledge_speed", input.goingRight);
                 break;
 
             case States.OnClimbGrid:
@@ -234,7 +235,7 @@ public class MotionController : MonoBehaviour {
         }
 
 
-        animator.SetFloat("forward", input.moveMagnitude * speedFactor);
+        animator.SetFloat("ground_speed", input.moveMagnitude * speedFactor);
         animator.SetBool("grounded", grounded);
         animator.SetFloat("vertical_speed", rb.velocity.y);
 
