@@ -277,6 +277,8 @@ public class MotionController : MonoBehaviour {
                 if (Mathf.Abs(rb.velocity.y) < 5e-4) {
                     if (ledgeDetector.AdjustFacingToLedge()) {
                         state = States.GrabStable;
+                        StartCoroutine(input.LockInputForSeconds(0.3f));
+                        jumped = false;
                     } else if (grabStuckSecondChance > 0) {
                         grabStuckSecondChance--;
                     } else {
@@ -331,7 +333,6 @@ public class MotionController : MonoBehaviour {
             if (!frontDetected) {
                 if (interactDetector.DetectLedgeBelow()) {
                     interact = InteractType.LedgeBelow;
-                    //interactHintText.text = "Press F to Climb Ledge Below";
                 }
             }
             //if (grounded) {
@@ -342,7 +343,7 @@ public class MotionController : MonoBehaviour {
             //    //}
             //}
         } else if (state == States.GrabStable) {
-            interactHintText.text = "Press R to Climb Up, X to Drop Down";
+            interactHintText.text = "Press W to Climb Up, X to Drop Down";
         } else if (state == States.OnClimbGrid) {
             interactHintText.text = "Press X to Drop Down";
         }
