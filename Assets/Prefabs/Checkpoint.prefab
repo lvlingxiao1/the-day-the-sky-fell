@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 315378774760059485}
   - component: {fileID: 315378774760059474}
   m_Layer: 8
-  m_Name: Checkpoint 1
+  m_Name: Checkpoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -357,19 +357,6 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
---- !u!65 &8983245789622907081
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6905510538396182021}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.2880173, y: 2.5739422, z: 0.85554504}
-  m_Center: {x: 0, y: 1.364959, z: 0}
 --- !u!1 &6701820527743835458
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,6 +449,19 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!65 &8983245789622907081
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6905510538396182021}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.2880173, y: 2.5739422, z: 0.85554504}
+  m_Center: {x: 0, y: 1.364959, z: 0}
 --- !u!1 &7988244974265246889
 GameObject:
   m_ObjectHideFlags: 0
@@ -573,6 +573,7 @@ MonoBehaviour:
   - Looks like I can take a break here.
   - I just realized...this might be the last Cola I ever drink.
   - Goodbye tooth-rotting drink. May I never get another cavity
+  - Thankfully I don't have to pay for these drinks...
   sfx: 
   numTriggers: 1
 --- !u!1001 &5986450411683257172
