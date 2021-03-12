@@ -10,6 +10,10 @@ public class CameraController : MonoBehaviour {
     public float cameraSpeedKeyboardY = 60;
     public float peakOffset;
 
+    [Header("Camera Deadzone Settings")]
+    public float deadZoneRadius;
+    public int deadZoneSteps;
+
     PlayerInput input;
     Vector3 defaultLocalPosition;
     Vector3 defaultRotation;
@@ -28,6 +32,8 @@ public class CameraController : MonoBehaviour {
     public Vector3 forward;
     [HideInInspector]
     public Vector3 right;
+
+    readonly Vector3[] deadZoneDirs = {Vector3.left, Vector3.right}; // Seems we don't have issues with cliping into terrain for up and down, so I removed those 2 directions for performance gain
 
     //Text debugText;
 
@@ -64,7 +70,7 @@ public class CameraController : MonoBehaviour {
 
         targetLocalPosition = defaultLocalPosition + Vector3.right * peakOffset * input.peakRight;
 
-        collissionTest();
+        CollissionTest(deadZoneSteps);
 
         ComputeCameraForward();
         right = transform.right;
@@ -80,25 +86,64 @@ public class CameraController : MonoBehaviour {
         //debugText.text = $"{transform.rotation * cameraRestPosition} {transform.position} {restDistance} {hit}";
     }
 
-    void collissionTest() {
+    void CollissionTest(int deadZoneSteps) {
         localDistance = targetLocalPosition.magnitude;
-        bool hit = Physics.Raycast(transform.position, transform.rotation * targetLocalPosition,
-                out RaycastHit hitInfo, localDistance, environment);
-        if (hit) {
-            cameraHandle.localPosition = Vector3.Lerp(cameraHandle.localPosition,
-                (hitInfo.distance - 0.1f) / localDistance * targetLocalPosition, 0.3f);
-            if (hitInfo.distance < 1f) {
-                player_renderer1.enabled = false;
-                player_renderer2.enabled = false;
-                player_renderer3.enabled = false;
-                return;
+
+        Debug.DrawRay(transform.position, transform.rotation * targetLocalPosition, Color.cyan);
+        bool zoomHit = Physics.Raycast(transform.position, transform.rotation * targetLocalPosition,
+            out RaycastHit zoomHitInfo, localDistance, environment);
+
+        float stepSize = localDistance / deadZoneSteps;
+        int maxStep = zoomHit ? Mathf.FloorToInt(zoomHitInfo.distance / localDistance * deadZoneSteps) : deadZoneSteps;
+
+        // Each zoom segment or zoom step
+        Vector3 newCamWorldPosition = transform.TransformPoint(Vector3.Lerp(cameraHandle.localPosition, targetLocalPosition, 0.3f));
+        for (int i = maxStep; i >= 0; i--)
+        {
+            newCamWorldPosition = Vector3.Lerp(transform.position,
+                transform.TransformPoint(targetLocalPosition), i / (float) deadZoneSteps - 0.05f);
+            Debug.DrawLine(transform.TransformPoint(cameraHandle.localPosition), newCamWorldPosition, Color.red);
+
+            bool outsideDeadZone = true;
+            foreach (Vector3 dir in deadZoneDirs)
+            {
+                if (Physics.Raycast(newCamWorldPosition, transform.rotation * dir, out RaycastHit deadZoneHitInfo, deadZoneRadius, environment))
+                {
+                    outsideDeadZone = false;
+                    if (i == 0)
+                    {
+                        // Push it out
+                        newCamWorldPosition -= (deadZoneRadius - deadZoneHitInfo.distance) * (transform.rotation * dir);
+                    }
+                    Debug.DrawLine(newCamWorldPosition, newCamWorldPosition + transform.rotation * dir * deadZoneRadius, Color.red);
+                    break;
+                }
+                else
+                {
+                    Debug.DrawLine(newCamWorldPosition, newCamWorldPosition + transform.rotation * dir * deadZoneRadius, Color.blue);
+                }
             }
-        } else {
-            cameraHandle.localPosition = Vector3.Lerp(cameraHandle.localPosition, targetLocalPosition, 0.3f);
+
+            if (outsideDeadZone)
+            {
+                break;
+            }
         }
-        player_renderer1.enabled = true;
-        player_renderer2.enabled = true;
-        player_renderer3.enabled = true;
+
+        cameraHandle.position = newCamWorldPosition;
+
+        if (Vector3.Distance(newCamWorldPosition, transform.position) < 0.4f)
+        {
+            player_renderer1.enabled = false;
+            player_renderer2.enabled = false;
+            player_renderer3.enabled = false;
+        }
+        else
+        {
+            player_renderer1.enabled = true;
+            player_renderer2.enabled = true;
+            player_renderer3.enabled = true;
+        }
     }
 
     public void ResetCamera(Vector3 modelRotation) {
