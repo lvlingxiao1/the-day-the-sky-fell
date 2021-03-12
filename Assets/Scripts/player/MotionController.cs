@@ -115,14 +115,14 @@ public class MotionController : MonoBehaviour {
                 if (grounded) {
                     lastSafePosition = transform.position;
                     if (input.slowBtnHold) {
-                        speedFactor = Mathf.Lerp(speedFactor, 1, 0.3f);
+                        speedFactor = Mathf.Lerp(speedFactor, 1, 18 * Time.deltaTime);
                     } else {
-                        speedFactor = Mathf.Lerp(speedFactor, 2, 0.3f);
+                        speedFactor = Mathf.Lerp(speedFactor, 2, 18 * Time.deltaTime);
                     }
 
                     if (input.moveMagnitude > 0.1) {
                         Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
-                        modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.4f);
+                        modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 24 * Time.deltaTime);
                     }
 
                     if (input.jumpPressed) {
@@ -152,7 +152,7 @@ public class MotionController : MonoBehaviour {
                     }
                     if (input.moveMagnitude > 0.1) {
                         Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
-                        modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 0.1f);
+                        modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 6 * Time.deltaTime);
                     }
                     if (input.grabBtnDown) {
                         animator.SetBool("on_ledge", true);
@@ -220,9 +220,9 @@ public class MotionController : MonoBehaviour {
 
             case States.OnClimbGrid:
                 if (input.slowBtnHold) {
-                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed, 0.3f);
+                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed, 18 * Time.deltaTime);
                 } else {
-                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 2, 0.3f);
+                    climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 2, 18 * Time.deltaTime);
                 }
                 break;
 
@@ -263,7 +263,7 @@ public class MotionController : MonoBehaviour {
                     if (input.moveMagnitude > 0.1) {
                         newVelocity = forwardSpeed * input.moveMagnitude * modelTransform.forward * speedFactor;
                         newVelocity.y = rb.velocity.y;
-                        rb.velocity = Vector3.Lerp(rb.velocity, newVelocity, 0.1f);
+                        rb.velocity = Vector3.Lerp(rb.velocity, newVelocity, 5 * Time.fixedDeltaTime);
                     }
                 }
                 break;

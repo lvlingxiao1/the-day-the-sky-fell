@@ -17,10 +17,9 @@ public class CameraController : MonoBehaviour {
     PlayerInput input;
     Vector3 defaultLocalPosition;
     Vector3 defaultRotation;
-    Vector3 targetLocalPosition;
+    float restDistance;
     Vector3 targetRotation;
     Vector3 nextRotation;
-    float localDistance;
     int environment;
     SkinnedMeshRenderer player_renderer1;
     SkinnedMeshRenderer player_renderer2;
@@ -33,8 +32,6 @@ public class CameraController : MonoBehaviour {
     [HideInInspector]
     public Vector3 right;
 
-    readonly Vector3[] deadZoneDirs = {Vector3.left, Vector3.right}; // Seems we don't have issues with cliping into terrain for up and down, so I removed those 2 directions for performance gain
-
     //Text debugText;
 
     void Awake() {
@@ -46,6 +43,7 @@ public class CameraController : MonoBehaviour {
 
         defaultLocalPosition = cameraHandle.localPosition;
         defaultRotation = transform.localEulerAngles;
+        restDistance = defaultLocalPosition.magnitude;
         targetRotation = transform.eulerAngles;
         nextRotation = targetRotation;
 
@@ -68,15 +66,13 @@ public class CameraController : MonoBehaviour {
         targetRotation.x = Mathf.Clamp(targetRotation.x, -40, 70);
         transform.eulerAngles = targetRotation;
 
-        targetLocalPosition = defaultLocalPosition + Vector3.right * peakOffset * input.peakRight;
-
-        CollissionTest(deadZoneSteps);
+        CollissionTest();
 
         ComputeCameraForward();
         right = transform.right;
 
-        mainCamera.position = Vector3.Lerp(mainCamera.position, cameraHandle.position, 0.2f);
-        nextRotation = Vector3.Slerp(nextRotation, targetRotation, 0.2f);
+        mainCamera.position = Vector3.Lerp(mainCamera.position, cameraHandle.position, 10 * Time.fixedDeltaTime);
+        nextRotation = Vector3.Slerp(nextRotation, targetRotation, 10 * Time.fixedDeltaTime);
         mainCamera.eulerAngles = nextRotation;
 
         // // without transition
@@ -86,60 +82,39 @@ public class CameraController : MonoBehaviour {
         //debugText.text = $"{transform.rotation * cameraRestPosition} {transform.position} {restDistance} {hit}";
     }
 
-    void CollissionTest(int deadZoneSteps) {
-        localDistance = targetLocalPosition.magnitude;
+    void CollissionTest() {
+        Debug.DrawRay(transform.position, transform.rotation * defaultLocalPosition, Color.cyan);
+        bool hit = Physics.Raycast(transform.position, transform.rotation * defaultLocalPosition,
+            out RaycastHit hitInfo, restDistance, environment);
 
-        Debug.DrawRay(transform.position, transform.rotation * targetLocalPosition, Color.cyan);
-        bool zoomHit = Physics.Raycast(transform.position, transform.rotation * targetLocalPosition,
-            out RaycastHit zoomHitInfo, localDistance, environment);
-
-        float stepSize = localDistance / deadZoneSteps;
-        int maxStep = zoomHit ? Mathf.FloorToInt(zoomHitInfo.distance / localDistance * deadZoneSteps) : deadZoneSteps;
+        int maxSteps = hit ? Mathf.FloorToInt(hitInfo.distance / restDistance * deadZoneSteps) : deadZoneSteps;
+        float stepSize = 1f / deadZoneSteps;
 
         // Each zoom segment or zoom step
-        Vector3 newCamWorldPosition = transform.TransformPoint(Vector3.Lerp(cameraHandle.localPosition, targetLocalPosition, 0.3f));
-        for (int i = maxStep; i >= 0; i--)
-        {
+        Vector3 newCamWorldPosition = Vector3.zero;
+        Vector3[] deadZoneDirs = { transform.right, -transform.right }; // Seems we don't have issues with cliping into terrain for up and down, so I removed those 2 directions for performance gain
+        for (int i = maxSteps; i >= 0; i--) {
             newCamWorldPosition = Vector3.Lerp(transform.position,
-                transform.TransformPoint(targetLocalPosition), i / (float) deadZoneSteps - 0.05f);
+                transform.TransformPoint(defaultLocalPosition), i * stepSize);
             Debug.DrawLine(transform.TransformPoint(cameraHandle.localPosition), newCamWorldPosition, Color.red);
 
-            bool outsideDeadZone = true;
-            foreach (Vector3 dir in deadZoneDirs)
-            {
-                if (Physics.Raycast(newCamWorldPosition, transform.rotation * dir, out RaycastHit deadZoneHitInfo, deadZoneRadius, environment))
-                {
-                    outsideDeadZone = false;
-                    if (i == 0)
-                    {
-                        // Push it out
-                        newCamWorldPosition -= (deadZoneRadius - deadZoneHitInfo.distance) * (transform.rotation * dir);
-                    }
-                    Debug.DrawLine(newCamWorldPosition, newCamWorldPosition + transform.rotation * dir * deadZoneRadius, Color.red);
+            bool ok = true;
+            foreach (Vector3 dir in deadZoneDirs) {
+                if (Physics.Raycast(newCamWorldPosition, dir, deadZoneRadius, environment)) {
+                    ok = false;
                     break;
                 }
-                else
-                {
-                    Debug.DrawLine(newCamWorldPosition, newCamWorldPosition + transform.rotation * dir * deadZoneRadius, Color.blue);
-                }
             }
-
-            if (outsideDeadZone)
-            {
-                break;
-            }
+            if (ok) break;
         }
 
-        cameraHandle.position = newCamWorldPosition;
+        cameraHandle.position = Vector3.Lerp(cameraHandle.position, newCamWorldPosition, 15 * Time.fixedDeltaTime);
 
-        if (Vector3.Distance(newCamWorldPosition, transform.position) < 0.4f)
-        {
+        if (Vector3.SqrMagnitude(newCamWorldPosition - transform.position) < 0.16f) {
             player_renderer1.enabled = false;
             player_renderer2.enabled = false;
             player_renderer3.enabled = false;
-        }
-        else
-        {
+        } else {
             player_renderer1.enabled = true;
             player_renderer2.enabled = true;
             player_renderer3.enabled = true;
