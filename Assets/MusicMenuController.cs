@@ -66,11 +66,11 @@ public class MusicMenuController : MonoBehaviour {
         if (isPlaying) {
             source.Pause();
             isPlaying = false;
-            playPauseButton.sprite = pauseIcon;
+            playPauseButton.sprite = playIcon;
         } else {
             source.Play();
             isPlaying = true;
-            playPauseButton.sprite = playIcon;
+            playPauseButton.sprite = pauseIcon;
         }
     }
 
