@@ -65,13 +65,7 @@ public class CameraController : MonoBehaviour {
         targetRotation.x = Mathf.Clamp(targetRotation.x, -40, 70);
         transform.eulerAngles = targetRotation;
 
-<<<<<<< HEAD
         CollissionTest();
-=======
-        targetLocalPosition = defaultLocalPosition;
-
-        collissionTest();
->>>>>>> master
 
         ComputeCameraForward();
         right = transform.right;
