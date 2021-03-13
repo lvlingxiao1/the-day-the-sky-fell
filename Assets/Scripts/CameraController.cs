@@ -8,7 +8,6 @@ public class CameraController : MonoBehaviour {
     public float cameraSpeedMouseY = 60;
     public float cameraSpeedKeyboardX = 180;
     public float cameraSpeedKeyboardY = 60;
-    public float peakOffset;
 
     [Header("Camera Deadzone Settings")]
     public float deadZoneRadius;
@@ -18,7 +17,7 @@ public class CameraController : MonoBehaviour {
     Vector3 defaultLocalPosition;
     Vector3 defaultRotation;
     float restDistance;
-    Vector3 targetRotation;
+    public Vector3 targetRotation;
     Vector3 nextRotation;
     int environment;
     SkinnedMeshRenderer player_renderer1;
@@ -66,7 +65,13 @@ public class CameraController : MonoBehaviour {
         targetRotation.x = Mathf.Clamp(targetRotation.x, -40, 70);
         transform.eulerAngles = targetRotation;
 
+<<<<<<< HEAD
         CollissionTest();
+=======
+        targetLocalPosition = defaultLocalPosition;
+
+        collissionTest();
+>>>>>>> master
 
         ComputeCameraForward();
         right = transform.right;
