@@ -264,21 +264,21 @@ namespace Climbing
 
             if (n != null)
             {
-                if (moveDirection == targetPoint.ReturnNeighbor(previousPoint).direction)
+                if (IsAdjacentToRefDirection(moveDirection, targetPoint.ReturnNeighbor(previousPoint).direction))
                 {
                     float tempStartWeight = ikStartWeight;
                     ikStartWeight = ikEndWeight;
                     ikEndWeight = tempStartWeight;
                     targetPoint = previousPoint;
                 }
-                else if (moveDirection == previousPoint.ReturnNeighbor(targetPoint).direction)
-                {
-                    // Do nothing
-                }
-                else
-                {
-                    return;
-                }
+                //else if (IsAdjacentToRefDirection(moveDirection, previousPoint.ReturnNeighbor(targetPoint).direction))
+                //{
+                //    // Do nothing
+                //}
+                //else
+                //{
+                //    return;
+                //}
             }
             else
             {
@@ -291,6 +291,11 @@ namespace Climbing
             previousPoint = currentPoint;
             lockInput = true;
             anim.SetBool("GP_Move", false);
+        }
+
+        bool IsAdjacentToRefDirection(Vector3 testDirection, Vector3 refDirection)
+        {
+            return Vector3.Dot(testDirection, refDirection) > 0;
         }
 
         void UpdateConnectionTransitionByType(Neighbor n, Vector3 moveDirection)
@@ -720,6 +725,19 @@ namespace Climbing
                 initTransit = false;
                 ikLandSideReached = false;
                 climbState = targetState;
+
+                transitionHint.text = "";
+                Neighbor n = currentClimbObjManager.GetNeighborForDirection(Vector3.up, currentPoint);
+                if (n != null)
+                {
+                    transitionHint.text += "Press W to Climb Up\n";
+                }
+
+                n = currentClimbObjManager.GetNeighborForDirection(Vector3.down, currentPoint);
+                if (n != null)
+                {
+                    transitionHint.text += "Press S to Climb Down\n";
+                }
             }
 
             //Debug.Log(_time);
@@ -892,14 +910,17 @@ namespace Climbing
             if (climbState == ClimbStates.onPoint)
             {
                 currentPoint = targetPoint;
-                Neighbor n = currentClimbObjManager.GetNeighborForDirection(Vector3.down, currentPoint);
+                transitionHint.text = "";
+                Neighbor n = currentClimbObjManager.GetNeighborForDirection(Vector3.up, currentPoint);
                 if (n != null)
                 {
-                    transitionHint.text = "Press S to Climb Down";
+                    transitionHint.text += "Press W to Climb Up\n";
                 }
-                else
+
+                n = currentClimbObjManager.GetNeighborForDirection(Vector3.down, currentPoint);
+                if (n != null)
                 {
-                    transitionHint.text = "";
+                    transitionHint.text += "Press S to Climb Down\n";
                 }
             }
 
