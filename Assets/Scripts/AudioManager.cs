@@ -4,7 +4,6 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public Audio[] audios;
-    public string bgm;
     // Start is called before the first frame update
     void Awake()
     {
@@ -15,7 +14,6 @@ public class AudioManager : MonoBehaviour
             i.source.pitch = i.pitch;
             i.source.loop = i.loop;
         }
-        Play(bgm);
     }
 
     public void Play(string id) {
