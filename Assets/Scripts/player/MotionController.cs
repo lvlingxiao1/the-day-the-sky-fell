@@ -137,7 +137,7 @@ public class MotionController : MonoBehaviour {
                             SetStateGrab();
                             rb.velocity = new Vector3(0, 0, 0);
                             camera.targetRotation.x = 70;
-                            StartCoroutine(input.LockInputForSeconds(0.7f));
+                            input.LockInputForSeconds(1f);
                             break;
                         }
                     }
@@ -148,7 +148,7 @@ public class MotionController : MonoBehaviour {
                             SetStateGrab();
                             rb.velocity = new Vector3(0, 0, 0);
                             camera.targetRotation.x = 70;
-                            StartCoroutine(input.LockInputForSeconds(0.7f));
+                            input.LockInputForSeconds(1f);
                             break;
                         }
                     }
@@ -218,7 +218,7 @@ public class MotionController : MonoBehaviour {
                 if (input.goingForward > 0) {  // teleport up
                     ledgeDetector.ClimbUpLedge();
                     SetStateNormal();
-                    StartCoroutine(input.LockInputForSeconds(0.3f));
+                    input.LockInputForSeconds(1f);
                 } else if (input.releaseBtnDown || input.goingForward < 0) {
                     SetStateNormal();
                 }
@@ -285,7 +285,7 @@ public class MotionController : MonoBehaviour {
                 if (Mathf.Abs(rb.velocity.y) < 5e-4) {
                     if (ledgeDetector.AdjustFacingToLedge()) {
                         state = States.GrabStable;
-                        StartCoroutine(input.LockInputForSeconds(0.3f));
+                        input.LockInputForSeconds(1f);
                         autoClimbDown = true;
                     } else if (grabStuckSecondChance > 0) {
                         grabStuckSecondChance--;

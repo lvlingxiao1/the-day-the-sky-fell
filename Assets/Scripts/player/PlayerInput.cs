@@ -24,6 +24,8 @@ public class PlayerInput : MonoBehaviour {
     private float verticleInputRaw;
     private float horizontalInputRaw;
 
+    private Coroutine currentLockCoroutine;
+
     private void Awake() {
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -59,7 +61,12 @@ public class PlayerInput : MonoBehaviour {
         moveMagnitude = Mathf.Sqrt(goingForward * goingForward + goingRight * goingRight);
     }
 
-    public IEnumerator LockInputForSeconds(float seconds) {
+    public void LockInputForSeconds(float seconds) {
+        if (currentLockCoroutine != null) StopCoroutine(currentLockCoroutine);
+        currentLockCoroutine = StartCoroutine(LockInputCoroutine(seconds));
+    }
+
+    public IEnumerator LockInputCoroutine(float seconds) {
         inputEnabled = false;
         yield return new WaitForSeconds(seconds);
         inputEnabled = true;

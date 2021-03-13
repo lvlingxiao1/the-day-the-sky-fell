@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnPositionOffset: {x: 0, y: -1.364959, z: 1.4}
+  respawnRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &315378776024672499
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,7 +476,7 @@ GameObject:
   - component: {fileID: 2025463606864004768}
   - component: {fileID: 1815530991667440340}
   - component: {fileID: 4814382620854184128}
-  m_Layer: 8
+  m_Layer: 2
   m_Name: CaptionDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}

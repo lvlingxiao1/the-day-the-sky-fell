@@ -9,14 +9,13 @@ public class CheckpointManager : MonoBehaviour {
         new Sentence("", "Drinks replenished", null, "vending machine")
     };
     private Vector3 respawnPosition;
-    private Vector3 respawnRotation;
+    public Vector3 respawnRotation;
     private bool handled = false;
 
     private void Awake() {
         respawnPosition = transform.position + transform.rotation * respawnPositionOffset;
         respawnRotation = transform.eulerAngles;
         respawnRotation.y += 180;
-        respawnRotation.z = 0;
     }
 
     public void Respawn(MotionController controller, DialogueManager dialogueManager) {
@@ -31,13 +30,10 @@ public class CheckpointManager : MonoBehaviour {
         if (controller.lives > 0) {
             controller.lives--;
             controller.transform.position = controller.lastSafePosition;
-            Vector3 angles = controller.modelTransform.eulerAngles;
-            angles.y += 180;
-            controller.modelTransform.eulerAngles = angles;
         } else {
             controller.lives = controller.livesMax;
             controller.transform.position = respawnPosition;
-            controller.modelTransform.forward = -controller.transform.forward; ;
+            controller.modelTransform.eulerAngles = respawnRotation;
         }
         GameObject.Find("LivesText").GetComponent<TextMeshProUGUI>().text = $"Drinks: {controller.lives}";
         controller.SetStateNormal();

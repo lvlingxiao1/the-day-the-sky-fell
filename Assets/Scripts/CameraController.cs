@@ -70,8 +70,8 @@ public class CameraController : MonoBehaviour {
         ComputeCameraForward();
         right = transform.right;
 
-        mainCamera.position = Vector3.Lerp(mainCamera.position, cameraHandle.position, 10 * Time.fixedDeltaTime);
-        nextRotation = Vector3.Slerp(nextRotation, targetRotation, 10 * Time.fixedDeltaTime);
+        mainCamera.position = Vector3.Lerp(mainCamera.position, cameraHandle.position, 0.2f);
+        nextRotation = Vector3.Slerp(nextRotation, targetRotation, 0.2f);
         mainCamera.eulerAngles = nextRotation;
 
         // // without transition
@@ -107,7 +107,7 @@ public class CameraController : MonoBehaviour {
             if (ok) break;
         }
 
-        cameraHandle.position = Vector3.Lerp(cameraHandle.position, newCamWorldPosition, 15 * Time.fixedDeltaTime);
+        cameraHandle.position = Vector3.Lerp(cameraHandle.position, newCamWorldPosition, 0.3f);
 
         if (Vector3.SqrMagnitude(newCamWorldPosition - transform.position) < 0.16f) {
             player_renderer1.enabled = false;
