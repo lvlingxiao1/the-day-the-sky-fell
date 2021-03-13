@@ -403,12 +403,12 @@ namespace Climbing
                 Vector3 directionToPoint = (_endPosition - _startPosition).normalized;
 
                 bool isMidPoint = (targetState == ClimbStates.betweenPoints);
-                if (isMidPoint)
-                {
-                    // Adjust model root to better fit animation
-                    Vector3 backSwing = modelTransform.forward * -0.05f;
-                    _endPosition += backSwing;
-                }
+                //if (isMidPoint)
+                //{
+                //    // Adjust model root to better fit animation
+                //    Vector3 backSwing = modelTransform.forward * -0.05f;
+                //    _endPosition += backSwing;
+                //}
 
                 _distance = Vector3.Distance(_endPosition, _startPosition);
 
