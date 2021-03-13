@@ -9,13 +9,16 @@ public class CameraController : MonoBehaviour {
     public float cameraSpeedKeyboardX = 180;
     public float cameraSpeedKeyboardY = 60;
 
+    [Header("Camera Deadzone Settings")]
+    public float deadZoneRadius;
+    public int deadZoneSteps;
+
     PlayerInput input;
     Vector3 defaultLocalPosition;
     Vector3 defaultRotation;
-    public Vector3 targetLocalPosition;
+    float restDistance;
     public Vector3 targetRotation;
     Vector3 nextRotation;
-    float localDistance;
     int environment;
     SkinnedMeshRenderer player_renderer1;
     SkinnedMeshRenderer player_renderer2;
@@ -39,6 +42,7 @@ public class CameraController : MonoBehaviour {
 
         defaultLocalPosition = cameraHandle.localPosition;
         defaultRotation = transform.localEulerAngles;
+        restDistance = defaultLocalPosition.magnitude;
         targetRotation = transform.eulerAngles;
         nextRotation = targetRotation;
 
@@ -61,15 +65,19 @@ public class CameraController : MonoBehaviour {
         targetRotation.x = Mathf.Clamp(targetRotation.x, -40, 70);
         transform.eulerAngles = targetRotation;
 
+<<<<<<< HEAD
+        CollissionTest();
+=======
         targetLocalPosition = defaultLocalPosition;
 
         collissionTest();
+>>>>>>> master
 
         ComputeCameraForward();
         right = transform.right;
 
-        mainCamera.position = Vector3.Lerp(mainCamera.position, cameraHandle.position, 0.2f);
-        nextRotation = Vector3.Slerp(nextRotation, targetRotation, 0.2f);
+        mainCamera.position = Vector3.Lerp(mainCamera.position, cameraHandle.position, 10 * Time.fixedDeltaTime);
+        nextRotation = Vector3.Slerp(nextRotation, targetRotation, 10 * Time.fixedDeltaTime);
         mainCamera.eulerAngles = nextRotation;
 
         // // without transition
@@ -79,25 +87,43 @@ public class CameraController : MonoBehaviour {
         //debugText.text = $"{transform.rotation * cameraRestPosition} {transform.position} {restDistance} {hit}";
     }
 
-    void collissionTest() {
-        localDistance = targetLocalPosition.magnitude;
-        bool hit = Physics.Raycast(transform.position, transform.rotation * targetLocalPosition,
-                out RaycastHit hitInfo, localDistance, environment);
-        if (hit) {
-            cameraHandle.localPosition = Vector3.Lerp(cameraHandle.localPosition,
-                (hitInfo.distance - 0.1f) / localDistance * targetLocalPosition, 0.3f);
-            if (hitInfo.distance < 1f) {
-                player_renderer1.enabled = false;
-                player_renderer2.enabled = false;
-                player_renderer3.enabled = false;
-                return;
+    void CollissionTest() {
+        Debug.DrawRay(transform.position, transform.rotation * defaultLocalPosition, Color.cyan);
+        bool hit = Physics.Raycast(transform.position, transform.rotation * defaultLocalPosition,
+            out RaycastHit hitInfo, restDistance, environment);
+
+        int maxSteps = hit ? Mathf.FloorToInt(hitInfo.distance / restDistance * deadZoneSteps) : deadZoneSteps;
+        float stepSize = 1f / deadZoneSteps;
+
+        // Each zoom segment or zoom step
+        Vector3 newCamWorldPosition = Vector3.zero;
+        Vector3[] deadZoneDirs = { transform.right, -transform.right }; // Seems we don't have issues with cliping into terrain for up and down, so I removed those 2 directions for performance gain
+        for (int i = maxSteps; i >= 0; i--) {
+            newCamWorldPosition = Vector3.Lerp(transform.position,
+                transform.TransformPoint(defaultLocalPosition), i * stepSize);
+            Debug.DrawLine(transform.TransformPoint(cameraHandle.localPosition), newCamWorldPosition, Color.red);
+
+            bool ok = true;
+            foreach (Vector3 dir in deadZoneDirs) {
+                if (Physics.Raycast(newCamWorldPosition, dir, deadZoneRadius, environment)) {
+                    ok = false;
+                    break;
+                }
             }
-        } else {
-            cameraHandle.localPosition = Vector3.Lerp(cameraHandle.localPosition, targetLocalPosition, 0.3f);
+            if (ok) break;
         }
-        player_renderer1.enabled = true;
-        player_renderer2.enabled = true;
-        player_renderer3.enabled = true;
+
+        cameraHandle.position = Vector3.Lerp(cameraHandle.position, newCamWorldPosition, 15 * Time.fixedDeltaTime);
+
+        if (Vector3.SqrMagnitude(newCamWorldPosition - transform.position) < 0.16f) {
+            player_renderer1.enabled = false;
+            player_renderer2.enabled = false;
+            player_renderer3.enabled = false;
+        } else {
+            player_renderer1.enabled = true;
+            player_renderer2.enabled = true;
+            player_renderer3.enabled = true;
+        }
     }
 
     public void ResetCamera(Vector3 modelRotation) {
