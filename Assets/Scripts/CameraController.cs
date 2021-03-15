@@ -121,7 +121,7 @@ public class CameraController : MonoBehaviour {
     }
 
     public void ResetCamera(Vector3 modelRotation) {
-        targetRotation = modelRotation + defaultRotation;
+        targetRotation = modelRotation + defaultRotation;   // model rotation has only Y component, default rotation only has X component
         transform.eulerAngles = targetRotation;
         ComputeCameraForward();
     }
@@ -130,5 +130,9 @@ public class CameraController : MonoBehaviour {
         forward = transform.forward;
         forward.y = 0;
         forward.Normalize();
+    }
+
+    public void ResetVertical() {
+        targetRotation.x = defaultRotation.x;
     }
 }

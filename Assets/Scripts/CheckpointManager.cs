@@ -39,18 +39,20 @@ public class CheckpointManager : MonoBehaviour {
 
     private IEnumerator respawnCoroutine(MotionController controller) {
         yield return new WaitForSeconds(0.9f);
+        CameraController cameraController = FindObjectOfType<CameraController>();
         if (controller.lives > 0) {
             controller.lives--;
             controller.transform.position = controller.lastSafePosition;
+            controller.modelTransform.forward = cameraController.forward;
+            cameraController.ResetVertical();
         } else {
             controller.lives = controller.livesMax;
             controller.transform.position = respawnPosition;
             controller.modelTransform.eulerAngles = respawnRotation;
+            cameraController.ResetCamera(respawnRotation);
         }
         controller.livesUI.SetLives(controller.lives);
         controller.SetStateNormal();
-        CameraController cameraController = FindObjectOfType<CameraController>();
-        cameraController.ResetCamera(respawnRotation);
         // // I think reset all captions is too much... I changed it to just reset the caption of the current vending machine
         //CaptionDetector[] captionTriggers = FindObjectsOfType<CaptionDetector>();
         //foreach(CaptionDetector trigger in captionTriggers) {

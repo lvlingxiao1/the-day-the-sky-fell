@@ -221,6 +221,7 @@ public class MotionController : MonoBehaviour {
                 if (input.goingForward > 0) {  // teleport up
                     ledgeDetector.ClimbUpLedge();
                     SetStateNormal();
+                    camera.ResetVertical();
                     input.LockInputForSeconds(0.5f);
                 } else if (input.releaseBtnDown || input.goingForward < 0) {
                     SetStateNormal();
