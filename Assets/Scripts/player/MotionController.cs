@@ -11,8 +11,8 @@ public class MotionController : MonoBehaviour {
     public float interactDetectDistance = 1.0f;
     public float ledgeSpeed = 3f;
     public float climbGridSpeed = 3f;
-    public int livesMax = 1;
-    public int lives = 1;
+    public int livesMax = 0;
+    public int lives = 0;
     public Vector3 lastSafePosition;
 
     public string defaultCheckpoint;
@@ -71,6 +71,7 @@ public class MotionController : MonoBehaviour {
     CheckpointManager currentCheckpoint;
     ClimbController climbController;
     DialogueManager dialogueManager;
+    public LivesUI livesUI;
 
 
     void Awake() {
@@ -98,7 +99,8 @@ public class MotionController : MonoBehaviour {
         dialogueManager = FindObjectOfType<DialogueManager>();
 
         currentCheckpoint = GameObject.Find(defaultCheckpoint).GetComponent<CheckpointManager>();
-        GameObject.Find("LivesText").GetComponent<TextMeshProUGUI>().text = $"Drinks: {lives}";
+
+        livesUI = new LivesUI(lives);
     }
 
     void Update() {
@@ -181,11 +183,9 @@ public class MotionController : MonoBehaviour {
                         state = States.Dialogue;
                     } else if (interact == InteractType.Checkpoint) {
                         currentCheckpoint = hitInfo.collider.GetComponentInParent<CheckpointManager>();
-                        currentCheckpoint.TriggerDialogue(dialogueManager);
+                        currentCheckpoint.HandleInteract(this, dialogueManager);
                         rb.isKinematic = true;
                         state = States.Dialogue;
-                        lives = livesMax;
-                        GameObject.Find("LivesText").GetComponent<TextMeshProUGUI>().text = $"Drinks: {lives}";
                     } else if (interact == InteractType.Item) {
                         hitInfo.collider.GetComponent<IItem>().PickUp();
                     }
