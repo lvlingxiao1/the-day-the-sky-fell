@@ -85,7 +85,7 @@ public class MusicMenuController : MonoBehaviour {
         source.clip = musicItems[next].clip;
         source.Play();
         isPlaying = true;
-        playPauseButton.sprite = playIcon;
+        playPauseButton.sprite = pauseIcon;
     }
 
     public void PrevTrack() {
@@ -100,7 +100,7 @@ public class MusicMenuController : MonoBehaviour {
         source.clip = musicItems[prev].clip;
         source.Play();
         isPlaying = true;
-        playPauseButton.sprite = playIcon;
+        playPauseButton.sprite = pauseIcon;
     }
 
     public void SwitchTrack(int i) {
@@ -112,6 +112,12 @@ public class MusicMenuController : MonoBehaviour {
         source.clip = musicItems[i].clip;
         source.Play();
         isPlaying = true;
-        playPauseButton.sprite = playIcon;
+        playPauseButton.sprite = pauseIcon;
+    }
+
+    public void AddToCollection(int id) {
+        if (musicItems[id].collected) return;
+        musicItems[id].collected = true;
+        menuItems[id].text = $"{id + 1}.  {musicItems[id].name}";
     }
 }

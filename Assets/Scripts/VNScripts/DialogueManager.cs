@@ -76,15 +76,19 @@ public class DialogueManager : MonoBehaviour {
         blackScreenAnimator.SetTrigger("start");
     }
 
-    public void DisplayCaption(string[] captionComments, string sfx) {
+    public void StartCaption(string[] captionComments, string sfx, float duration) {
+        StartCoroutine(CaptionCoroutine(captionComments, sfx, duration));
+    }
+
+    IEnumerator CaptionCoroutine(string[] captionComments, string sfx, float duration) {
         displayingCaption++;
         int index = Random.Range(0, captionComments.Length);
         captionText.text = captionComments[index];
         captionText.enabled = true;
         audioManager.Play(sfx);
-    }
 
-    public void RemoveCaption() {
+        yield return new WaitForSeconds(duration);
+
         displayingCaption--;
         if (displayingCaption <= 0) {
             StartCoroutine(FadeOut());

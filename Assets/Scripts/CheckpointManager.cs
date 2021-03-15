@@ -39,10 +39,13 @@ public class CheckpointManager : MonoBehaviour {
         controller.SetStateNormal();
         CameraController cameraController = FindObjectOfType<CameraController>();
         cameraController.ResetCamera(respawnRotation);
-        CaptionDetector[] captionTriggers = FindObjectsOfType<CaptionDetector>();
-        foreach(CaptionDetector trigger in captionTriggers) {
-            trigger.ResetTriggers();
-        }
+        // // I think reset all captions is too much... I changed it to just reset the caption of the current vending machine
+        //CaptionDetector[] captionTriggers = FindObjectsOfType<CaptionDetector>();
+        //foreach(CaptionDetector trigger in captionTriggers) {
+        //    trigger.ResetTriggers();
+        //}
+        CaptionDetector caption = GetComponentInChildren<CaptionDetector>();
+        if (caption) caption.ResetTriggers();
         handled = false;
     }
 

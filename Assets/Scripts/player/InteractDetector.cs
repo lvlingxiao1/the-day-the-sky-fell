@@ -58,9 +58,6 @@ public class InteractDetector {
                 return true;
             }
         }
-
-
-
         return false;
     }
 }

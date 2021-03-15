@@ -47,7 +47,8 @@ public class MotionController : MonoBehaviour {
         LedgeBelow,
         LedgeAbove,
         Dialogue,
-        Checkpoint
+        Checkpoint,
+        Item
     }
     InteractType interact;
     RaycastHit hitInfo;
@@ -185,6 +186,8 @@ public class MotionController : MonoBehaviour {
                         state = States.Dialogue;
                         lives = livesMax;
                         GameObject.Find("LivesText").GetComponent<TextMeshProUGUI>().text = $"Drinks: {lives}";
+                    } else if (interact == InteractType.Item) {
+                        hitInfo.collider.GetComponent<IItem>().PickUp();
                     }
                 }
 
@@ -325,16 +328,19 @@ public class MotionController : MonoBehaviour {
             if (frontDetected) {
                 if (hitInfo.collider.CompareTag("ladder")) {
                     interact = InteractType.Ladder;
-                    interactHintText.text = "Press F to Climb Ladder";
+                    interactHintText.text = "Press [F] to Climb Ladder";
                     return;
                 } else if (hitInfo.collider.CompareTag("DialogueTrigger")) {
                     interact = InteractType.Dialogue;
-                    interactHintText.text = "Press F to Talk";
+                    interactHintText.text = "Press [F] to Talk";
                     return;
                 } else if (hitInfo.collider.CompareTag("checkpoint")) {
                     interact = InteractType.Checkpoint;
-                    interactHintText.text = "Press F to Take a Break at Checkpoint";
+                    interactHintText.text = "Press [F] to Take a Break at Checkpoint";
                     return;
+                } else if (hitInfo.collider.CompareTag("Item") && !hitInfo.collider.GetComponent<IItem>().IsPickedUp()) {
+                    interact = InteractType.Item;
+                    interactHintText.text = hitInfo.collider.GetComponent<IItem>().GetInteractMessage();
                 }
             }
 

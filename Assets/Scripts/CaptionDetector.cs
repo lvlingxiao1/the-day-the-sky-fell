@@ -12,13 +12,10 @@ public class CaptionDetector : MonoBehaviour {
         initialTriggers = numTriggers;
     }
 
-    IEnumerator OnTriggerEnter(Collider col) {
+    void OnTriggerEnter(Collider col) {
         if (numTriggers > 0 && col.CompareTag("Player")) {
             numTriggers -= 1;
-            DialogueManager manager = FindObjectOfType<DialogueManager>();
-            manager.DisplayCaption(captionComments, sfx);
-            yield return new WaitForSeconds(3);
-            manager.RemoveCaption();
+            FindObjectOfType<DialogueManager>().StartCaption(captionComments, sfx, 3);
         }
     }
 
