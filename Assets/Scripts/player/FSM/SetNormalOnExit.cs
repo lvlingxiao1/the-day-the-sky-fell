@@ -18,6 +18,7 @@ public class SetNormalOnExit : StateMachineBehaviour {
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         GameObject.Find("Player").GetComponentInParent<MotionController>().SetStateNormal();
+        GameObject.Find("Player").GetComponentInParent<MotionController>().AdjustRoot();
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

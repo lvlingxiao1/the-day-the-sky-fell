@@ -219,8 +219,9 @@ public class MotionController : MonoBehaviour {
                     speedFactor = Mathf.Lerp(speedFactor, 1, 0.3f);
                 }
                 if (input.goingForward > 0) {  // teleport up
-                    ledgeDetector.ClimbUpLedge();
-                    SetStateNormal();
+                    rb.isKinematic = true;
+                    animator.SetTrigger("ledge_climb_up");
+                    //SetStateNormal();
                     camera.ResetVertical();
                     input.LockInputForSeconds(0.5f);
                 } else if (input.releaseBtnDown || input.goingForward < 0) {
@@ -255,6 +256,11 @@ public class MotionController : MonoBehaviour {
         }
 
         debugText.text = $"{state} {rb.velocity}";
+    }
+
+    public void AdjustRoot()
+    {
+        ledgeDetector.ClimbUpLedge();
     }
 
     private void FixedUpdate() {
