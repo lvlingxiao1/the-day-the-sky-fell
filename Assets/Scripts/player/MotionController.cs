@@ -132,7 +132,7 @@ public class MotionController : MonoBehaviour {
 
                     if (input.jumpPressed) {
                         jumpPending = true;
-                        audioManager.Play("footstep");
+                        audioManager.Play($"jump{Random.Range(1, 3)}");
                     }
 
                     if (interact == InteractType.LedgeBelow && input.grabBtnDown) {
@@ -227,6 +227,8 @@ public class MotionController : MonoBehaviour {
                     input.LockInputForSeconds(0.5f);
                 } else if (input.releaseBtnDown || input.goingForward < 0) {
                     SetStateNormal();
+                    audioManager.Play($"land{Random.Range(1, 3)}");
+                    input.LockInputForSeconds(0.5f);
                 }
                 animator.SetFloat("ledge_speed", input.goingRight * speedFactor);
                 break;
