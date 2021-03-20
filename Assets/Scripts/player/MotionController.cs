@@ -233,6 +233,10 @@ public class MotionController : MonoBehaviour {
                 animator.SetFloat("ledge_speed", input.goingRight * speedFactor);
                 break;
 
+            case States.Grab:
+                animator.SetFloat("ledge_speed", 0);
+                break;
+
             case States.OnClimbGrid:
                 if (input.runBtnHold) {
                     climbController.speed_linear = Mathf.Lerp(climbController.speed_linear, climbGridSpeed * 1.5f, 18 * Time.deltaTime);
@@ -295,8 +299,9 @@ public class MotionController : MonoBehaviour {
                 break;
 
             case States.Grab:
+                bool detected = ledgeDetector.AdjustFacingToLedge();
                 if (Mathf.Abs(rb.velocity.y) < 5e-4) {
-                    if (ledgeDetector.AdjustFacingToLedge()) {
+                    if (detected) {
                         state = States.GrabStable;
                         input.LockInputForSeconds(0.5f);
                         autoClimbDown = true;
