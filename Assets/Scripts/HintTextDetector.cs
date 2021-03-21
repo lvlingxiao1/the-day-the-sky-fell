@@ -7,7 +7,7 @@ public class HintTextDetector : MonoBehaviour {
     private TextMeshPro hint;
 
     private void Awake() {
-        hint = transform.parent.gameObject.GetComponent<TextMeshPro>();
+        hint = gameObject.GetComponent<TextMeshPro>();
     }
 
     void OnTriggerEnter(Collider col) {
