@@ -372,9 +372,9 @@ public class MotionController : MonoBehaviour {
             //    //}
             //}
         } else if (state == States.GrabStable) {
-            interactHintText.text = "Press W to Climb Up, X to Drop Down";
+            interactHintText.text = "Press [W] to Climb Up\nPress [X] to Drop Down";
         } else if (state == States.OnClimbGrid) {
-            interactHintText.text = "Press X to Drop Down";
+            interactHintText.text = "Press [X] to Drop Down";
         }
     }
 
@@ -418,5 +418,9 @@ public class MotionController : MonoBehaviour {
 
     public bool IsInGrabState() {
         return state == States.Grab || state == States.GrabStable;
+    }
+
+    public bool ShouldRotateCamera() {
+        return state != States.Grab && state != States.GrabStable && state != States.OnClimbGrid;
     }
 }

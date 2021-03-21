@@ -13,6 +13,7 @@ public class CaptionManager : MonoBehaviour {
     void Awake() {
         animator = GetComponent<Animator>();
         captionText = GetComponentInChildren<TextMeshProUGUI>();
+        audioManager = FindObjectOfType<AudioManager>();
     }
 
     public void StartCaption(CaptionSentence[] sentences) {

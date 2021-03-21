@@ -25,6 +25,7 @@ public class CameraController : MonoBehaviour {
     SkinnedMeshRenderer player_renderer3;
     Transform mainCamera;
     Transform cameraHandle;
+    MotionController motionController;
 
     [HideInInspector]
     public Vector3 forward;
@@ -35,6 +36,7 @@ public class CameraController : MonoBehaviour {
 
     void Awake() {
         input = FindObjectOfType<PlayerInput>();
+        motionController = FindObjectOfType<MotionController>();
         mainCamera = GameObject.Find("Main Camera").transform;
         cameraHandle = GameObject.Find("CameraHandle").transform;
         mainCamera.position = cameraHandle.position;
@@ -61,6 +63,9 @@ public class CameraController : MonoBehaviour {
         } else {
             targetRotation.y += input.cameraHorizontal * cameraSpeedKeyboardX * Time.fixedDeltaTime;
             targetRotation.x -= input.cameraVertical * cameraSpeedKeyboardY * Time.fixedDeltaTime;
+        }
+        if (motionController.ShouldRotateCamera()) {
+            targetRotation.y += input.goingRight * 0.5f * cameraSpeedKeyboardX * Time.fixedDeltaTime;
         }
         targetRotation.x = Mathf.Clamp(targetRotation.x, -40, 70);
         transform.eulerAngles = targetRotation;
