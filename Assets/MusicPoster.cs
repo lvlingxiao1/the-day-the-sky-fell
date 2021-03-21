@@ -12,7 +12,7 @@ public class MusicPoster : MonoBehaviour, IItem {
         FindObjectOfType<AudioManager>().Play("QR Scan");
         menu.AddToCollection(musicId);
         menu.SwitchTrack(musicId);
-        FindObjectOfType<DialogueManager>().StartCaption(new string[] { $"New music: {menu.musicItems[musicId].name} is found! Press [Tab] to show music player" }, null, 3);
+        FindObjectOfType<CaptionManager>().StartCaption(new CaptionSentence[] { new CaptionSentence($"New music: {menu.musicItems[musicId].name} is found! Press [Tab] to show music player") });
         pickedUp = true;
     }
 

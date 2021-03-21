@@ -59,7 +59,7 @@ public class LedgeDetector {
         newPos.y = playerTransform.position.y;
         Vector3 newForward = -hitInfo.normal;
         newForward.y = 0;
-        playerTransform.position = Vector3.Lerp(playerTransform.position, newPos, 0.7f);
+        playerTransform.position = Vector3.Lerp(playerTransform.position, newPos, 0.5f);
         modelTransform.forward = Vector3.Slerp(modelTransform.forward, newForward, 0.3f);
         return true;
     }

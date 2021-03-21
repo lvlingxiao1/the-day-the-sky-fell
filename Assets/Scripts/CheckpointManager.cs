@@ -58,7 +58,7 @@ public class CheckpointManager : MonoBehaviour {
         //foreach(CaptionDetector trigger in captionTriggers) {
         //    trigger.ResetTriggers();
         //}
-        CaptionDetector caption = GetComponentInChildren<CaptionDetector>();
+        CaptionTrigger caption = GetComponentInChildren<CaptionTrigger>();
         if (caption) caption.ResetTriggers();
         handled = false;
     }

@@ -284,15 +284,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 4213786497526850064}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 317f326aebe9fc6428b1adad93fa4530, type: 3}
+  m_Script: {fileID: 11500000, guid: cae2cd1013489a645b6197f71106f290, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  captionComments:
-  - "Who\u2019s a good boy? You\u2019re a good boy!"
-  - You know the problem with WFH? No dogs. I miss petting dogs on the street.
-  - "Oh, you\u2019re so fluffy!!"
-  sfx: 
-  numTriggers: 1
+  captionsCollection:
+  - sentences:
+    - content: "Who\u2019s a good boy? You\u2019re a good boy!"
+      audio: 
+      duration: 3
+  - sentences:
+    - content: You know the problem with WFH? No dogs. I miss petting dogs on the
+        street.
+      audio: 
+      duration: 3
+  - sentences:
+    - content: "Oh, you\u2019re so fluffy!!"
+      audio: 
+      duration: 3
+  numTriggers: 3
 --- !u!1 &4806847348207596347
 GameObject:
   m_ObjectHideFlags: 0
