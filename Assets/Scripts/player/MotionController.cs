@@ -417,6 +417,6 @@ public class MotionController : MonoBehaviour {
     }
 
     public bool IsInGrabState() {
-        return state == States.Grab;
+        return state == States.Grab || state == States.GrabStable;
     }
 }
