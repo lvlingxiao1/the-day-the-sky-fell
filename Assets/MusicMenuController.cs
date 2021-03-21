@@ -12,9 +12,7 @@ public class MusicItem {
 }
 
 public class MusicMenuController : MonoBehaviour {
-    const int MUSIC_TOTAL = 6;
-
-    public MusicItem[] musicItems = new MusicItem[MUSIC_TOTAL];
+    public MusicItem[] musicItems;
     public int currentTrack = 0;
     public bool isPlaying = true;
     public Sprite playIcon;
@@ -22,20 +20,26 @@ public class MusicMenuController : MonoBehaviour {
     public Color activeColour;
     Color defaultColour = new Color(0, 0, 0);
 
+    private int numMusic;
     private bool show = false;
     private Animator animator;
-    private Transform menu;
     private AudioSource source;
-    private TextMeshProUGUI[] menuItems = new TextMeshProUGUI[MUSIC_TOTAL];
+    private TextMeshProUGUI[] menuItems;
     private Image playPauseButton;
 
     private void Awake() {
+        numMusic = musicItems.Length;
+        menuItems = new TextMeshProUGUI[numMusic];
         source = GetComponent<AudioSource>();
         playPauseButton = GameObject.Find("PlayPause").GetComponent<Image>();
-        menu = transform.GetChild(2).transform;
+        Transform menu = GameObject.Find("MusicMenuContent").transform;
         animator = GetComponent<Animator>();
-        for (int i = 0; i < MUSIC_TOTAL; i++) {
-            menuItems[i] = menu.GetChild(i).GetComponent<TextMeshProUGUI>();
+        for (int i = 0; i < numMusic; i++) {
+            Transform child = menu.GetChild(i);
+            menuItems[i] = child.GetComponent<TextMeshProUGUI>();
+            Button button = child.GetComponent<Button>();
+            int temp = i;
+            button.onClick.AddListener(() => SwitchTrack(temp));    // use i directly does not work
             string title = musicItems[i].collected ? musicItems[i].name : "??????";
             menuItems[i].text = $"{i + 1}.  {title}";
             if (currentTrack == i) {
@@ -75,9 +79,9 @@ public class MusicMenuController : MonoBehaviour {
     }
 
     public void NextTrack() {
-        int next = (currentTrack + 1) % MUSIC_TOTAL;
+        int next = (currentTrack + 1) % numMusic;
         while (!musicItems[next].collected) {
-            next = (next + 1) % MUSIC_TOTAL;
+            next = (next + 1) % numMusic;
         }
         menuItems[currentTrack].color = defaultColour;
         menuItems[next].color = activeColour;
@@ -92,7 +96,7 @@ public class MusicMenuController : MonoBehaviour {
         int prev = currentTrack;
         do {
             prev--;
-            if (prev < 0) prev += MUSIC_TOTAL;
+            if (prev < 0) prev += numMusic;
         } while (!musicItems[prev].collected);
         menuItems[currentTrack].color = defaultColour;
         menuItems[prev].color = activeColour;
