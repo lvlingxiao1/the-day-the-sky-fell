@@ -195,7 +195,7 @@ public class MotionController : MonoBehaviour {
 
 
             case States.OnLadder:
-                if (input.releaseBtnDown || input.interactBtnDown) {
+                if (input.interactBtnDown) {
                     SetStateNormal();
                 }
                 if (transform.position.y >= currentLadder.TopY - 1.70f) {
@@ -225,7 +225,7 @@ public class MotionController : MonoBehaviour {
                     SetStateNormal();
                     camera.ResetVertical();
                     input.LockInputForSeconds(0.5f);
-                } else if (input.releaseBtnDown || input.goingForward < 0) {
+                } else if (input.goingForward < 0) {
                     SetStateNormal();
                     audioManager.Play($"land{Random.Range(1, 3)}");
                     input.LockInputForSeconds(0.5f);

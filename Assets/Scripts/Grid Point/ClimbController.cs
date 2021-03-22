@@ -874,7 +874,7 @@ namespace Climbing
         #region FallOff
         void InitFallOff()
         {
-            if (input.releaseBtnDown || confirmFallOff)
+            if (confirmFallOff)
             {
                 confirmFallOff = false;
                 climbing = false;
