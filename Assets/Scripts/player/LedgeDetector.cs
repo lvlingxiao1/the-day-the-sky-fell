@@ -40,21 +40,23 @@ public class LedgeDetector {
         return true;
     }
 
-    public void ClimbUpLedge() {
-        playerTransform.position += modelTransform.rotation * new Vector3(0, -hangOffsetY, hangOffsetZ * 2);
+    public void ClimbUpLedge(bool onTelephoneWire = false) {
+        playerTransform.position += modelTransform.rotation * new Vector3(0, -hangOffsetY, hangOffsetZ * (onTelephoneWire ? 1.5f : 2));
     }
 
-    public bool AdjustFacingToLedge() {
+    public bool AdjustFacingToLedge(out bool isTelephoneWire) {
         Debug.DrawRay(playerTransform.position + modelTransform.rotation * adjustFacingPoint1, modelTransform.forward * adjustDetectDistance, new Color(0, 1, 0));
         Debug.DrawRay(playerTransform.position + modelTransform.rotation * adjustFacingPoint2, modelTransform.forward * adjustDetectDistance, new Color(0, 1, 0));
         Debug.DrawRay(playerTransform.position + modelTransform.rotation * adjustFacingPoint3, modelTransform.forward * adjustDetectDistance, new Color(0, 1, 0));
         Vector3 horizontalOffset = Vector3.zero;
+        isTelephoneWire = false;
         if (!Physics.Raycast(playerTransform.position + modelTransform.rotation * adjustFacingPoint1, modelTransform.forward, out hitInfo, adjustDetectDistance, environment)) {
             if (!Physics.Raycast(playerTransform.position + modelTransform.rotation * adjustFacingPoint2, modelTransform.forward, out hitInfo, adjustDetectDistance, environment)) {
                 if (!Physics.Raycast(playerTransform.position + modelTransform.rotation * adjustFacingPoint3, modelTransform.forward, out hitInfo, adjustDetectDistance, environment)) return false;
                 else horizontalOffset = modelTransform.rotation * Vector3.right * -0.4f;
             } else horizontalOffset = modelTransform.rotation * Vector3.right * 0.4f;
         }
+        isTelephoneWire = hitInfo.transform.CompareTag("TelephoneWire");
         Vector3 newPos = hitInfo.point + hitInfo.normal * hangOffsetZ + horizontalOffset;
         newPos.y = playerTransform.position.y;
         Vector3 newForward = -hitInfo.normal;

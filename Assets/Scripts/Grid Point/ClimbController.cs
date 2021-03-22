@@ -882,6 +882,7 @@ namespace Climbing
                 ik.SetAllIKWeights(0);
                 //mc.SetStateOnClimbGrid2();
                 mc.SetStateNormal();
+                input.LockInputForSeconds(0.5f);
                 anim.SetBool("GP_OnGrid", false);
                 anim.SetBool("GP_Move", false);
                 anim.SetBool("grounded", false);

@@ -23,6 +23,7 @@ public class MotionController : MonoBehaviour {
 
     // attributes
     public bool grounded;
+    bool onTelephoneWire;
     bool prevGrounded = true;
     float speedFactor;
     int grabStuckSecondChance;
@@ -212,7 +213,7 @@ public class MotionController : MonoBehaviour {
                     state = States.Grab;
                     break;
                 }
-                ledgeDetector.AdjustFacingToLedge();
+                ledgeDetector.AdjustFacingToLedge(out onTelephoneWire);
                 if (input.runBtnHold) {
                     speedFactor = Mathf.Lerp(speedFactor, 1.2f, 0.3f);
                 } else {
@@ -221,7 +222,7 @@ public class MotionController : MonoBehaviour {
                 if (input.goingForward > 0) {  // teleport up
                     //rb.isKinematic = true;
                     //animator.SetTrigger("ledge_climb_up");
-                    ledgeDetector.ClimbUpLedge();
+                    ledgeDetector.ClimbUpLedge(onTelephoneWire);
                     SetStateNormal();
                     camera.ResetVertical();
                     input.LockInputForSeconds(0.5f);
@@ -299,7 +300,7 @@ public class MotionController : MonoBehaviour {
                 break;
 
             case States.Grab:
-                bool detected = ledgeDetector.AdjustFacingToLedge();
+                bool detected = ledgeDetector.AdjustFacingToLedge(out onTelephoneWire);
                 if (Mathf.Abs(rb.velocity.y) < 5e-4) {
                     if (detected) {
                         state = States.GrabStable;

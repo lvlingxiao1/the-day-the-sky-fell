@@ -8,6 +8,7 @@ TagManager:
   - DialogueTrigger
   - checkpoint
   - Item
+  - TelephoneWire
   layers:
   - Default
   - TransparentFX
