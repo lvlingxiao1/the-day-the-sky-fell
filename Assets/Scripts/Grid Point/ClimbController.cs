@@ -62,6 +62,8 @@ namespace Climbing
         bool ikFollowSideReached;
 
         bool lockInput;
+        bool downBuffered;
+        bool confirmFallOff;
         Vector3 inputDirection;
         Vector3 targetPosition;
         
@@ -228,6 +230,18 @@ namespace Climbing
                             break;
                     }
                 }
+                else
+                {
+                    switch (climbState)
+                    {
+                        case ClimbStates.betweenPoints:
+                            inputDirection = previousPoint.ReturnNeighbor(targetPoint).direction;
+                            HandleBetweenPoints(inputDirection);
+                            break;
+                    }
+                }
+
+                downBuffered = IsAdjacentToRefDirection(inputDirection, Vector3.down);
 
                 // Temporary snap player to point for moving climbable objects
                 transform.parent = currentPoint.transform.parent;
@@ -256,6 +270,13 @@ namespace Climbing
                 UpdateConnectionTransitionByType(neighbor, moveDirection);
                 lockInput = true;
             }
+            else if (moveDirection == Vector3.down && !downBuffered)
+            {
+                confirmFallOff = true;
+                return;
+            }
+
+            confirmFallOff = false;
         }
 
         void HandleBetweenPoints(Vector3 moveDirection)
@@ -730,13 +751,17 @@ namespace Climbing
                 Neighbor n = currentClimbObjManager.GetNeighborForDirection(Vector3.up, currentPoint);
                 if (n != null)
                 {
-                    transitionHint.text += "Press W to Climb Up\n";
+                    transitionHint.text += "Press [W] to Climb Up\n";
                 }
 
                 n = currentClimbObjManager.GetNeighborForDirection(Vector3.down, currentPoint);
                 if (n != null)
                 {
-                    transitionHint.text += "Press S to Climb Down\n";
+                    transitionHint.text += "Press [S] to Climb Down\n";
+                }
+                else
+                {
+                    transitionHint.text += "Press [S] to Drop Down\n";
                 }
             }
 
@@ -849,20 +874,18 @@ namespace Climbing
         #region FallOff
         void InitFallOff()
         {
-            //if (climbState == ClimbStates.onPoint)
+            if (input.releaseBtnDown || confirmFallOff)
             {
-                if (input.releaseBtnDown)
-                {
-                    climbing = false;
-                    initTransit = false;
-                    ik.SetAllIKWeights(0);
-                    //mc.SetStateOnClimbGrid2();
-                    mc.SetStateNormal();
-                    anim.SetBool("GP_OnGrid", false);
-                    anim.SetBool("GP_Move", false);
-                    anim.SetBool("grounded", false);
-                    transitionHint.text = "";
-                }
+                confirmFallOff = false;
+                climbing = false;
+                initTransit = false;
+                ik.SetAllIKWeights(0);
+                //mc.SetStateOnClimbGrid2();
+                mc.SetStateNormal();
+                anim.SetBool("GP_OnGrid", false);
+                anim.SetBool("GP_Move", false);
+                anim.SetBool("grounded", false);
+                transitionHint.text = "";
             }
         }
         #endregion
@@ -914,13 +937,17 @@ namespace Climbing
                 Neighbor n = currentClimbObjManager.GetNeighborForDirection(Vector3.up, currentPoint);
                 if (n != null)
                 {
-                    transitionHint.text += "Press W to Climb Up\n";
+                    transitionHint.text += "Press [W] to Climb Up\n";
                 }
 
                 n = currentClimbObjManager.GetNeighborForDirection(Vector3.down, currentPoint);
                 if (n != null)
                 {
-                    transitionHint.text += "Press S to Climb Down\n";
+                    transitionHint.text += "Press [S] to Climb Down\n";
+                }
+                else
+                {
+                    transitionHint.text += downBuffered ? "Press [S] Again to Drop Down\n" : "Press [S] to Drop Down\n";
                 }
             }
 
