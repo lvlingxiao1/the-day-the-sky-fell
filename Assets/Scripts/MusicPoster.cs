@@ -17,6 +17,6 @@ public class MusicPoster : MonoBehaviour, IItem {
     }
 
     public string GetInteractMessage() {
-        return "Press [F] to Scan QR Code";
+        return "Press [E] to Scan QR Code";
     }
 }

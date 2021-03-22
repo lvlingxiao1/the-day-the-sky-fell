@@ -343,15 +343,15 @@ public class MotionController : MonoBehaviour {
             if (frontDetected) {
                 if (hitInfo.collider.CompareTag("ladder")) {
                     interact = InteractType.Ladder;
-                    interactHintText.text = "Press [F] to Climb Ladder";
+                    interactHintText.text = "Press [E] to Climb Ladder";
                     return;
                 } else if (hitInfo.collider.CompareTag("DialogueTrigger")) {
                     interact = InteractType.Dialogue;
-                    interactHintText.text = "Press [F] to Talk";
+                    interactHintText.text = "Press [E] to Talk";
                     return;
                 } else if (hitInfo.collider.CompareTag("checkpoint")) {
                     interact = InteractType.Checkpoint;
-                    interactHintText.text = "Press [F] to Take a Break at Checkpoint";
+                    interactHintText.text = "Press [E] to Take a Break at Checkpoint";
                     return;
                 } else if (hitInfo.collider.CompareTag("Item") && !hitInfo.collider.GetComponent<IItem>().IsPickedUp()) {
                     interact = InteractType.Item;
@@ -372,9 +372,9 @@ public class MotionController : MonoBehaviour {
             //    //}
             //}
         } else if (state == States.GrabStable) {
-            interactHintText.text = "Press [W] to Climb Up\nPress [X] to Drop Down";
+            interactHintText.text = "Press [W] to Climb Up\nPress [S] to Drop Down";
         } else if (state == States.OnClimbGrid) {
-            interactHintText.text = "Press [X] to Drop Down";
+            //interactHintText.text = "Press [S] to Drop Down";
         }
     }
 
