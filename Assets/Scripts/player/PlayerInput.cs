@@ -47,20 +47,23 @@ public class PlayerInput : MonoBehaviour {
             // elliptical grid mapping: https://arxiv.org/ftp/arxiv/papers/1509/1509.06344.pdf
             goingForward = verticleInputRaw * Mathf.Sqrt(1 - horizontalInputRaw * horizontalInputRaw * 0.5f);
             goingRight = horizontalInputRaw * Mathf.Sqrt(1 - verticleInputRaw * verticleInputRaw * 0.5f);
-        } else {
-            jumpPressed = false;
-            interactBtnDown = false;
-            cancelBtnDown = false;
-            goingForward = 0;
-            goingRight = 0;
-            runBtnHold = false;
         }
 
         moveMagnitude = Mathf.Sqrt(goingForward * goingForward + goingRight * goingRight);
     }
 
+    void ResetInput() {
+        jumpPressed = false;
+        interactBtnDown = false;
+        cancelBtnDown = false;
+        goingForward = 0;
+        goingRight = 0;
+        runBtnHold = false;
+    }
+
     public void LockInputForSeconds(float seconds) {
         if (currentLockCoroutine != null) StopCoroutine(currentLockCoroutine);
+        ResetInput();
         currentLockCoroutine = StartCoroutine(LockInputCoroutine(seconds));
     }
 

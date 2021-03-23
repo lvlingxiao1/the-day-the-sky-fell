@@ -303,8 +303,8 @@ public class MotionController : MonoBehaviour {
                 bool detected = ledgeDetector.AdjustFacingToLedge(out onTelephoneWire);
                 if (Mathf.Abs(rb.velocity.y) < 5e-4) {
                     if (detected) {
-                        state = States.GrabStable;
                         input.LockInputForSeconds(0.5f);
+                        state = States.GrabStable;
                         autoClimbDown = true;
                     } else if (grabStuckSecondChance > 0) {
                         grabStuckSecondChance--;
