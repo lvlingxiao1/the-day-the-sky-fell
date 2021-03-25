@@ -6,7 +6,7 @@ public class GroundDetector {
     readonly Vector3 offset = new Vector3(0, 0.3f, 0);
     readonly float distance = 0.4f;
     readonly Transform playerTransform;
-    readonly int environment = LayerMask.GetMask("environment");
+    readonly int environment = LayerMask.GetMask("environment") | LayerMask.GetMask("Default");
     public GroundDetector(Transform playerTransform) {
         this.playerTransform = playerTransform;
     }

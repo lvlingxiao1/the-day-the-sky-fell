@@ -23,6 +23,7 @@ public class MotionController : MonoBehaviour {
 
     // attributes
     public bool grounded;
+    int inAir;
     bool onTelephoneWire;
     bool prevGrounded = true;
     float speedFactor;
@@ -111,6 +112,8 @@ public class MotionController : MonoBehaviour {
             autoClimbDown = true;
         }
         prevGrounded = grounded;
+        if (grounded) inAir = 0;
+        else inAir++;
 
         FindInteractType();
 
@@ -129,11 +132,6 @@ public class MotionController : MonoBehaviour {
                     if (input.moveMagnitude > 0.1) {
                         Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
                         modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 24 * Time.deltaTime);
-                    }
-
-                    if (input.jumpPressed) {
-                        jumpPending = true;
-                        audioManager.Play($"jump{Random.Range(1, 3)}");
                     }
 
                     if (interact == InteractType.LedgeBelow && input.grabBtnDown) {
@@ -167,6 +165,11 @@ public class MotionController : MonoBehaviour {
                         grabStuckSecondChance = 5;  // velocity becomes 0 once when jumping up 
                         state = States.Grab;
                     }
+                }
+
+                if (input.jumpPressed && inAir < 10) {      // left ground for less than 1/6 seconds
+                    jumpPending = true;
+                    audioManager.Play($"jump{Random.Range(1, 3)}");
                 }
 
                 if (input.interactBtnDown) {
@@ -209,7 +212,7 @@ public class MotionController : MonoBehaviour {
                 break;
 
             case States.GrabStable:
-                if (Mathf.Abs(rb.velocity.y) > 0.1) {
+                if (Mathf.Abs(rb.velocity.y) > 0.5f) {
                     state = States.Grab;
                     break;
                 }
@@ -346,11 +349,11 @@ public class MotionController : MonoBehaviour {
                     interact = InteractType.Ladder;
                     interactHintText.text = "Press [E] to Climb Ladder";
                     return;
-                } else if (hitInfo.collider.CompareTag("DialogueTrigger")) {
+                } else if (grounded && hitInfo.collider.CompareTag("DialogueTrigger")) {
                     interact = InteractType.Dialogue;
                     interactHintText.text = "Press [E] to Talk";
                     return;
-                } else if (hitInfo.collider.CompareTag("checkpoint")) {
+                } else if (grounded && hitInfo.collider.CompareTag("checkpoint")) {
                     interact = InteractType.Checkpoint;
                     interactHintText.text = "Press [E] to Take a Break at Checkpoint";
                     return;
@@ -365,13 +368,6 @@ public class MotionController : MonoBehaviour {
                     interact = InteractType.LedgeBelow;
                 }
             }
-            //if (grounded) {
-            //} else {    // not on ground
-            //    //if (interactDetector.DetectLedgeAbove()) {
-            //    //    interact = InteractType.LedgeAbove;
-            //    //    interactHintText.text = "Press F to Climb Ledge Above";
-            //    //}
-            //}
         } else if (state == States.GrabStable) {
             interactHintText.text = "Press [W] to Climb Up\nPress [S] to Drop Down";
         } else if (state == States.OnClimbGrid) {

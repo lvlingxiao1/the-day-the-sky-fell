@@ -48,7 +48,7 @@ public class CameraController : MonoBehaviour {
         targetRotation = transform.eulerAngles;
         nextRotation = targetRotation;
 
-        environment = LayerMask.GetMask("environment");
+        environment = LayerMask.GetMask("environment") | LayerMask.GetMask("Default");
         player_renderer1 = GameObject.Find("BodyMesh").GetComponent<SkinnedMeshRenderer>();
         player_renderer2 = GameObject.Find("BackpackMesh").GetComponent<SkinnedMeshRenderer>();
         player_renderer3 = GameObject.Find("HairMesh").GetComponent<SkinnedMeshRenderer>();
@@ -96,7 +96,7 @@ public class CameraController : MonoBehaviour {
 
         // Each zoom segment or zoom step
         Vector3 newCamWorldPosition = Vector3.zero;
-        Vector3[] deadZoneDirs = { transform.right, -transform.right }; // Seems we don't have issues with cliping into terrain for up and down, so I removed those 2 directions for performance gain
+        Vector3[] deadZoneDirs = { transform.right, -transform.right }; // Seems we don't have issues with clipping into terrain for up and down, so I removed those 2 directions for performance gain
         for (int i = maxSteps; i >= 0; i--) {
             newCamWorldPosition = Vector3.Lerp(transform.position,
                 transform.TransformPoint(defaultLocalPosition), i * stepSize);
@@ -114,7 +114,7 @@ public class CameraController : MonoBehaviour {
 
         cameraHandle.position = Vector3.Lerp(cameraHandle.position, newCamWorldPosition, 0.3f);
 
-        if (Vector3.SqrMagnitude(newCamWorldPosition - transform.position) < 0.16f) {
+        if (Vector3.SqrMagnitude(newCamWorldPosition - transform.position) < 0.09f) {
             player_renderer1.enabled = false;
             player_renderer2.enabled = false;
             player_renderer3.enabled = false;
