@@ -24,6 +24,7 @@ public class MusicMenuController : MonoBehaviour {
     private bool show = false;
     private Animator animator;
     private AudioSource source;
+    private AudioSource buttonSE;
     private TextMeshProUGUI[] menuItems;
     private Image playPauseButton;
 
@@ -31,8 +32,9 @@ public class MusicMenuController : MonoBehaviour {
         numMusic = musicItems.Length;
         menuItems = new TextMeshProUGUI[numMusic];
         source = GetComponent<AudioSource>();
-        playPauseButton = GameObject.Find("PlayPause").GetComponent<Image>();
-        Transform menu = GameObject.Find("MusicMenuContent").transform;
+        playPauseButton = transform.Find("ControlButtons/PlayPauseButton/PlayPause").GetComponent<Image>();
+        buttonSE = transform.Find("ButtonSE").GetComponent<AudioSource>();
+        Transform menu = transform.Find("Scroll View/Viewport/MusicMenuContent").transform;
         animator = GetComponent<Animator>();
         for (int i = 0; i < numMusic; i++) {
             Transform child = menu.GetChild(i);
@@ -67,6 +69,7 @@ public class MusicMenuController : MonoBehaviour {
     }
 
     public void PlayPause() {
+        buttonSE.Play();
         if (isPlaying) {
             source.Pause();
             isPlaying = false;
@@ -79,6 +82,7 @@ public class MusicMenuController : MonoBehaviour {
     }
 
     public void NextTrack() {
+        buttonSE.Play();
         int next = (currentTrack + 1) % numMusic;
         while (!musicItems[next].collected) {
             next = (next + 1) % numMusic;
@@ -93,6 +97,7 @@ public class MusicMenuController : MonoBehaviour {
     }
 
     public void PrevTrack() {
+        buttonSE.Play();
         int prev = currentTrack;
         do {
             prev--;
@@ -109,6 +114,7 @@ public class MusicMenuController : MonoBehaviour {
 
     public void SwitchTrack(int i) {
         if (!musicItems[i].collected) return;
+        buttonSE.Play();
         menuItems[currentTrack].color = defaultColour;
         currentTrack = i;
         menuItems[i].color = activeColour;

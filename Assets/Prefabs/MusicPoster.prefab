@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6350283817021092458}
   - component: {fileID: 6350283817021092454}
   - component: {fileID: 6350283817021092455}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: MusicPoster
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6350283818226261607}
   - component: {fileID: 6350283818226261606}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -188,7 +188,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 1073743105
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
