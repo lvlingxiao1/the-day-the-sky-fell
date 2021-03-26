@@ -66,6 +66,9 @@ public class MusicMenuController : MonoBehaviour {
                 Cursor.lockState = CursorLockMode.None;
             }
         }
+        if (!source.isPlaying) {
+            NextTrack(false);
+        }
     }
 
     public void PlayPause() {
@@ -81,8 +84,8 @@ public class MusicMenuController : MonoBehaviour {
         }
     }
 
-    public void NextTrack() {
-        buttonSE.Play();
+    public void NextTrack(bool playButtonSE = true) {
+        if (playButtonSE) buttonSE.Play();
         int next = (currentTrack + 1) % numMusic;
         while (!musicItems[next].collected) {
             next = (next + 1) % numMusic;
