@@ -17,6 +17,10 @@ public class LedgeDetector {
     readonly float adjustDetectDistance = 1.7f;
     private RaycastHit hitInfo;
 
+    readonly Vector3 forwardOffset = new Vector3(0, 0.5f, 0);
+    readonly Vector3 downOffset = new Vector3(0, 0.3f, 0.3f);
+    readonly float downDistance = 2.5f;
+
     private Vector3 canMoveRightColliderPos = new Vector3(0.362f, 2.11f, 0.311f);
     private Vector3 canMoveLeftColliderPos = new Vector3(-0.362f, 2.11f, 0.311f);
     private float canMoveColliderSize = 0.07f;
@@ -25,6 +29,15 @@ public class LedgeDetector {
         this.playerTransform = playerTransform;
         this.modelTransform = modelTransform;
         //debugText = GameObject.Find("debugText").GetComponent<Text>();
+    }
+
+    public bool DetectLedgeBelow() {
+        Debug.DrawRay(playerTransform.position + modelTransform.rotation * downOffset, Vector3.down * downDistance, new Color(0, 0.3f, 0));
+        Debug.DrawRay(playerTransform.position + modelTransform.rotation * new Vector3(0, -0.1f, 1), -modelTransform.forward * 1.5f, new Color(0, 1, 0));
+        if (!Physics.Raycast(playerTransform.position + forwardOffset, modelTransform.forward, 0.3f) && !Physics.Raycast(playerTransform.position + modelTransform.rotation * downOffset, Vector3.down, downDistance)) {
+            return true;
+        }
+        return false;
     }
 
     public bool EnterLedge() {

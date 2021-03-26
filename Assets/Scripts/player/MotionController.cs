@@ -46,14 +46,13 @@ public class MotionController : MonoBehaviour {
     enum InteractType {
         None,
         Ladder,
-        LedgeBelow,
-        LedgeAbove,
         Dialogue,
         Checkpoint,
         Item
     }
     InteractType interact;
     RaycastHit hitInfo;
+    bool ledgeBelow = false;
 
     // components
     Rigidbody rb;
@@ -119,6 +118,7 @@ public class MotionController : MonoBehaviour {
 
         switch (state) {
             case States.Normal:
+                ledgeBelow = ledgeDetector.DetectLedgeBelow();
                 if (grounded) {
                     lastSafePosition = transform.position;
                     if (input.runBtnHold) {
@@ -133,19 +133,9 @@ public class MotionController : MonoBehaviour {
                         Vector3 targetDirection = input.goingForward * camera.forward + input.goingRight * camera.right;
                         modelTransform.forward = Vector3.Slerp(modelTransform.forward, targetDirection, 24 * Time.deltaTime);
                     }
-
-                    if (interact == InteractType.LedgeBelow && input.grabBtnDown) {
-                        if (ledgeDetector.EnterLedge()) {
-                            SetStateGrab();
-                            rb.velocity = new Vector3(0, 0, 0);
-                            camera.targetRotation.x = 70;
-                            input.LockInputForSeconds(0.5f);
-                            break;
-                        }
-                    }
                 } else {
                     //audioManager.Stop("walk");
-                    if (autoClimbDown && interact == InteractType.LedgeBelow) {
+                    if (autoClimbDown && ledgeBelow) {
                         if (ledgeDetector.EnterLedge()) {
                             SetStateGrab();
                             rb.velocity = new Vector3(0, 0, 0);
@@ -365,12 +355,6 @@ public class MotionController : MonoBehaviour {
                 } else if (hitInfo.collider.CompareTag("Item") && !hitInfo.collider.GetComponent<IItem>().IsPickedUp()) {
                     interact = InteractType.Item;
                     interactHintText.text = hitInfo.collider.GetComponent<IItem>().GetInteractMessage();
-                }
-            }
-
-            if (!frontDetected) {
-                if (interactDetector.DetectLedgeBelow()) {
-                    interact = InteractType.LedgeBelow;
                 }
             }
         } else if (state == States.GrabStable) {

@@ -6,8 +6,8 @@ public class InteractDetector {
     readonly Vector3 forwardOffset = new Vector3(0, 0.5f, 0);
     readonly float forwardDistance = 1f;
 
-    readonly Vector3 downOffset = new Vector3(0, 0.3f, 1f);
-    readonly float downDistance = 2f;
+    readonly Vector3 downOffset = new Vector3(0, 0.3f, 0.3f);
+    readonly float downDistance = 2.5f;
 
     readonly Vector3 ledgeAboveOffset = new Vector3(0, 2.5f, 0);
     readonly float minVerticalOffset = 0.5f;
