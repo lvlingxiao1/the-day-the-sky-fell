@@ -167,7 +167,7 @@ public class MotionController : MonoBehaviour {
                     }
                 }
 
-                if (input.jumpPressed && inAir < 10) {      // left ground for less than 1/6 seconds
+                if (input.jumpPressed && inAir < 6 && !jumpPending) {      // left ground for less than 0.1 seconds
                     jumpPending = true;
                     audioManager.Play($"jump{Random.Range(1, 3)}");
                 }
@@ -288,6 +288,11 @@ public class MotionController : MonoBehaviour {
                     }
                     rb.velocity = newVelocity;
                 } else {
+                    if (jumpPending) {
+                        newVelocity.y += jumpSpeed;
+                        jumpPending = false;
+                        autoClimbDown = false;
+                    }
                     if (input.moveMagnitude > 0.1) {
                         newVelocity = forwardSpeed * input.moveMagnitude * modelTransform.forward * speedFactor;
                         newVelocity.y = rb.velocity.y;
