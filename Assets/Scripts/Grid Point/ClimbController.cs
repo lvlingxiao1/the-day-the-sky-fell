@@ -146,7 +146,7 @@ namespace Climbing
             Ray ray = new Ray(playerCenter, modelTransform.forward);
             Debug.DrawLine(playerCenter, playerCenter + (maxDistance * modelTransform.forward), Color.cyan);
             RaycastHit hitInfo;
-            LayerMask mask = 1 << 8; // dummy, set it later to grid manger layer
+            LayerMask mask = (1 << 8) | (1 << 30); // dummy, set it later to grid manger layer
 
 
             if (Physics.Raycast(ray, out hitInfo, maxDistance, mask))
