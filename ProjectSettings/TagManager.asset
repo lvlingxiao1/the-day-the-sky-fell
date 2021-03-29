@@ -41,7 +41,7 @@ TagManager:
   - 
   - 
   - Climbable
-  - 
+  - Post-Processing
   m_SortingLayers:
   - name: Default
     uniqueID: 0
