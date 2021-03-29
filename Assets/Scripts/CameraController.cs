@@ -93,7 +93,7 @@ public class CameraController : MonoBehaviour {
         Vector3 cameraPlaneCenter = newCamWorldPosition - (transform.rotation * defaultLocalPosition).normalized * Camera.main.nearClipPlane;
         Debug.DrawLine(transform.position, cameraPlaneCenter, Color.cyan);
 
-        Vector3[] checkDirs = { transform.right, -transform.right };
+        Vector3[] checkDirs = { transform.right, -transform.right, transform.up, -transform.up };
         float lerpRate = 0.3f;
         foreach (Vector3 dir in checkDirs)
         {
@@ -102,12 +102,11 @@ public class CameraController : MonoBehaviour {
             {
                 lerpRate = 0.7f;
                 newCamWorldPosition += (hitInfo.point - (cameraPlaneCenter + dir * fovOffset));
-                break;
             }
         }
         cameraHandle.position = Vector3.Lerp(cameraHandle.position, newCamWorldPosition, lerpRate);
 
-        if (Vector3.SqrMagnitude(newCamWorldPosition - transform.position) < 0.09f) {
+        if (Vector3.SqrMagnitude(newCamWorldPosition - transform.position) < 0.36f) {
             player_renderer1.enabled = false;
             player_renderer2.enabled = false;
             player_renderer3.enabled = false;
