@@ -4,6 +4,7 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public Audio[] audios;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -14,6 +15,8 @@ public class AudioManager : MonoBehaviour
             i.source.pitch = i.pitch;
             i.source.loop = i.loop;
         }
+
+        Play("wind_ambient");
     }
 
     public void Play(string id) {
@@ -41,5 +44,10 @@ public class AudioManager : MonoBehaviour
                 break;
             }
         }
+    }
+
+    public void SetMasterVolumne(float vol)
+    {
+        AudioListener.volume = Mathf.Clamp(vol, 0, 1);
     }
 }
