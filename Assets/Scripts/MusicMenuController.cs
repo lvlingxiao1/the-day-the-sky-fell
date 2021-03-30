@@ -66,7 +66,7 @@ public class MusicMenuController : MonoBehaviour {
                 Cursor.lockState = CursorLockMode.None;
             }
         }
-        if (!source.isPlaying) {
+        if (!source.isPlaying && isPlaying) {
             NextTrack(false);
         }
     }
@@ -74,14 +74,22 @@ public class MusicMenuController : MonoBehaviour {
     public void PlayPause() {
         buttonSE.Play();
         if (isPlaying) {
-            source.Pause();
-            isPlaying = false;
-            playPauseButton.sprite = playIcon;
+            Pause();
         } else {
-            source.Play();
-            isPlaying = true;
-            playPauseButton.sprite = pauseIcon;
+            Play();
         }
+    }
+
+    public void Play() {
+        source.Play();
+        isPlaying = true;
+        playPauseButton.sprite = pauseIcon;
+    }
+
+    public void Pause() {
+        source.Pause();
+        isPlaying = false;
+        playPauseButton.sprite = playIcon;
     }
 
     public void NextTrack(bool playButtonSE = true) {

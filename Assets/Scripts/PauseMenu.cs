@@ -8,14 +8,17 @@ public class PauseMenu : MonoBehaviour {
     public GameObject pauseMenuUI;
     private TextMeshProUGUI pauseMenuPrompt;
     private AudioManager am;
+    MusicMenuController musicPlayer;
     private const string promptMenuOn = "[Esc] Pause/Controls";
     private const string promptMenuOff = "[Esc] Resume";
+    private bool shouldResumeBGM = false;
 
     void Awake() {
         pauseMenuPrompt = GameObject.Find("MenuPrompt").GetComponent<TextMeshProUGUI>();
         pauseMenuPrompt.text = promptMenuOn;
 
         am = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+        musicPlayer = FindObjectOfType<MusicMenuController>();
     }
 
     // Update is called once per frame
@@ -34,6 +37,7 @@ public class PauseMenu : MonoBehaviour {
         pauseMenuPrompt.text = promptMenuOn;
         Time.timeScale = 1f;
         am.SetMasterVolumne(1f);
+        if (shouldResumeBGM) musicPlayer.Play();
         paused = false;
     }
 
@@ -41,7 +45,9 @@ public class PauseMenu : MonoBehaviour {
         pauseMenuUI.SetActive(true);
         pauseMenuPrompt.text = promptMenuOff;
         Time.timeScale = 0f;
-        am.SetMasterVolumne(0.5f);
+        am.SetMasterVolumne(0f);
+        shouldResumeBGM = musicPlayer.isPlaying;
+        if (shouldResumeBGM) musicPlayer.Pause();
         paused = true;
     }
 }

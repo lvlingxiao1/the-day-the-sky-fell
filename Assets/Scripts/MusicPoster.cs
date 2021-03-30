@@ -13,6 +13,7 @@ public class MusicPoster : MonoBehaviour, IItem {
         menu.AddToCollection(musicId);
         menu.SwitchTrack(musicId);
         FindObjectOfType<CaptionManager>().StartCaption(new CaptionSentence[] { new CaptionSentence($"New music: {menu.musicItems[musicId].name} is found! Press [Tab] to show music player") });
+        GetComponentInChildren<Light>().enabled = false;
         pickedUp = true;
     }
 

@@ -13,11 +13,13 @@ public class CheckpointManager : MonoBehaviour {
     private bool handled = false;
     private bool firstTime = true;
     private int LIVES_MAX = 3;
+    private AudioManager audioManager;
 
     private void Awake() {
         respawnPosition = transform.position + transform.rotation * respawnPositionOffset;
         respawnRotation = transform.eulerAngles;
         respawnRotation.y += 180;
+        audioManager = FindObjectOfType<AudioManager>();
     }
 
     public void HandleInteract(MotionController controller, DialogueManager dialogueManager) {
@@ -32,6 +34,7 @@ public class CheckpointManager : MonoBehaviour {
 
     public void Respawn(MotionController controller, DialogueManager dialogueManager) {
         if (handled) return;
+        audioManager.Play("falling");
         handled = true;
         dialogueManager.BlackScreen();
         StartCoroutine(respawnCoroutine(controller));
