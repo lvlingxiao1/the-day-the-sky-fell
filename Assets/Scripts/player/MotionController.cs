@@ -63,8 +63,10 @@ public class MotionController : MonoBehaviour {
     GroundDetector groundDetector;
     InteractDetector interactDetector;
     LedgeDetector ledgeDetector;
-    BoxCollider hangCollider;
-    BoxCollider grabArmCollider;
+    //BoxCollider hangCollider;
+    //BoxCollider grabArmCollider;
+    DelayedCollider hangCollider;
+    DelayedCollider grabArmCollider;
     CapsuleCollider mainCollider;
     Text interactHintText;
     PlayerInput input;
@@ -87,8 +89,8 @@ public class MotionController : MonoBehaviour {
         animator = modelTransform.GetComponent<Animator>();
 
         debugText = GameObject.Find("debugText").GetComponent<Text>();
-        hangCollider = GameObject.Find("HangCollider").GetComponent<BoxCollider>();
-        grabArmCollider = GameObject.Find("GrabArmCollider").GetComponent<BoxCollider>();
+        hangCollider = GameObject.Find("HangCollider").GetComponent<DelayedCollider>();
+        grabArmCollider = GameObject.Find("GrabArmCollider").GetComponent<DelayedCollider>();
         interactHintText = GameObject.Find("InteractHint").GetComponent<Text>();
 
         groundDetector = new GroundDetector(transform);
@@ -150,8 +152,8 @@ public class MotionController : MonoBehaviour {
                     }
                     if (input.grabBtnDown) {
                         animator.SetBool("on_ledge", true);
-                        hangCollider.enabled = true;
-                        grabArmCollider.enabled = true;
+                        hangCollider.TurnOnCollider();
+                        grabArmCollider.TurnOnCollider();
                         grabStuckSecondChance = 5;  // velocity becomes 0 once when jumping up 
                         state = States.Grab;
                     }
@@ -369,8 +371,8 @@ public class MotionController : MonoBehaviour {
         grabStuckSecondChance = 5;  // velocity becomes 0 once when jumping up 
         grounded = false;
         state = States.Grab;
-        hangCollider.enabled = true;
-        grabArmCollider.enabled = true;
+        hangCollider.TurnOnCollider();
+        grabArmCollider.TurnOnCollider();
     }
 
     public void SetStateOnLadder() {
@@ -383,8 +385,8 @@ public class MotionController : MonoBehaviour {
         rb.useGravity = true;
         rb.velocity = Vector3.zero;
         mainCollider.enabled = true;
-        hangCollider.enabled = false;
-        grabArmCollider.enabled = false;
+        hangCollider.TurnOffCollider();
+        grabArmCollider.TurnOffCollider();
         animator.SetBool("climb", false);
         animator.SetBool("on_ledge", false);
     }
@@ -397,8 +399,8 @@ public class MotionController : MonoBehaviour {
         rb.isKinematic = true;
         rb.useGravity = false;
         mainCollider.enabled = false;
-        hangCollider.enabled = false;
-        grabArmCollider.enabled = false;
+        hangCollider.TurnOffCollider();
+        grabArmCollider.TurnOffCollider();
         state = States.OnClimbGrid;
     }
 
