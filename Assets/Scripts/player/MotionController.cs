@@ -19,6 +19,7 @@ public class MotionController : MonoBehaviour {
 
     // user inputs
     bool jumpPending = false;
+    bool jumped = false;
     bool autoClimbDown = false;
 
     // attributes
@@ -113,8 +114,10 @@ public class MotionController : MonoBehaviour {
             autoClimbDown = true;
         }
         prevGrounded = grounded;
-        if (grounded) inAir = 0;
-        else inAir++;
+        if (grounded) {
+            inAir = 0;
+            jumped = false;
+        } else inAir++;
 
         FindInteractType();
 
@@ -159,7 +162,7 @@ public class MotionController : MonoBehaviour {
                     }
                 }
 
-                if (input.jumpPressed && inAir < 6 && !jumpPending) {      // left ground for less than 0.1 seconds
+                if (input.jumpPressed && inAir < 6 && !jumpPending && !jumped) {      // left ground for less than 0.1 seconds
                     jumpPending = true;
                     audioManager.Play($"jump{Random.Range(1, 3)}");
                 }
@@ -192,6 +195,7 @@ public class MotionController : MonoBehaviour {
 
             case States.OnLadder:
                 if (input.interactBtnDown) {
+                    autoClimbDown = false;
                     SetStateNormal();
                 }
                 if (transform.position.y >= currentLadder.TopY - 1.70f) {
@@ -261,11 +265,6 @@ public class MotionController : MonoBehaviour {
         debugText.text = $"{state} {rb.velocity}";
     }
 
-    //public void AdjustRoot()
-    //{
-    //    ledgeDetector.ClimbUpLedge();
-    //}
-
     private void FixedUpdate() {
         rb.position += rootMotionDelta;
         switch (state) {
@@ -277,19 +276,22 @@ public class MotionController : MonoBehaviour {
                         newVelocity.y += jumpSpeed;
                         jumpPending = false;
                         autoClimbDown = false;
+                        jumped = true;
                     }
                     rb.velocity = newVelocity;
                 } else {
+                    newVelocity = forwardSpeed * input.moveMagnitude * modelTransform.forward * speedFactor;
+                    newVelocity = Vector3.Lerp(rb.velocity, newVelocity, 5 * Time.fixedDeltaTime);
+                    newVelocity.y = rb.velocity.y;
                     if (jumpPending) {
+                        inAir += 999;
                         newVelocity.y += jumpSpeed;
                         jumpPending = false;
                         autoClimbDown = false;
+                        jumped = true;
+                        print(newVelocity);
                     }
-                    if (input.moveMagnitude > 0.1) {
-                        newVelocity = forwardSpeed * input.moveMagnitude * modelTransform.forward * speedFactor;
-                        newVelocity.y = rb.velocity.y;
-                        rb.velocity = Vector3.Lerp(rb.velocity, newVelocity, 5 * Time.fixedDeltaTime);
-                    }
+                    rb.velocity = newVelocity;
                 }
                 break;
             case States.OnLadder:
@@ -361,8 +363,6 @@ public class MotionController : MonoBehaviour {
             }
         } else if (state == States.GrabStable) {
             interactHintText.text = "Press [W] to Climb Up\nPress [S] to Drop Down";
-        } else if (state == States.OnClimbGrid) {
-            //interactHintText.text = "Press [S] to Drop Down";
         }
     }
 
