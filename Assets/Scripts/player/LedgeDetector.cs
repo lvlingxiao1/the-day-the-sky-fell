@@ -49,7 +49,7 @@ public class LedgeDetector {
         Vector3 newForward = -hitInfo.normal;
         newForward.y = 0;
         modelTransform.forward = newForward;
-        playerTransform.position = hitInfo.point + hitInfo.normal * hangOffsetZ + Vector3.up * (hangOffsetY + 0.1f);
+        playerTransform.position = hitInfo.point + hitInfo.normal * hangOffsetZ + Vector3.up * (hangOffsetY + 0.2f);
         return true;
     }
 
