@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 177637503916127319}
   - component: {fileID: 4192203657120619664}
   m_Layer: 8
-  m_Name: TelephoneWire1
+  m_Name: Wire_Telephone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5561349426305759274, guid: a944b9e9ef957d646933dccd05c20253, type: 3}
+  - {fileID: -8274133419916619345, guid: 81e3ac574d9ce134e8b75eb3ab9a1a21, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -91,5 +91,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.25, y: 3.0000007, z: 0.025588877}
-  m_Center: {x: 0.12, y: -3.793806e-16, z: 0.0000019087456}
+  m_Size: {x: 0.027424755, y: 3.000001, z: 0.025588877}
+  m_Center: {x: 0.008712356, y: 2.8673058e-17, z: 0.0000019092113}

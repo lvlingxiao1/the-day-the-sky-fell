@@ -289,7 +289,6 @@ public class MotionController : MonoBehaviour {
                         jumpPending = false;
                         autoClimbDown = false;
                         jumped = true;
-                        print(newVelocity);
                     }
                     rb.velocity = newVelocity;
                 }
