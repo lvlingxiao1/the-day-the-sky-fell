@@ -18,32 +18,36 @@ public class MusicMenuController : MonoBehaviour {
     public Sprite playIcon;
     public Sprite pauseIcon;
     public Color activeColour;
-    Color defaultColour = new Color(0, 0, 0);
+    public Color defaultColour;
 
     private int numMusic;
     private bool show = false;
     private Animator animator;
     private AudioSource source;
     private AudioSource buttonSE;
+    private TextMeshProUGUI currentPlaying;
     private TextMeshProUGUI[] menuItems;
     private Image playPauseButton;
+    private Transform playlist;
+    private Image tabIcon;
 
     private void Awake() {
         numMusic = musicItems.Length;
         menuItems = new TextMeshProUGUI[numMusic];
         source = GetComponent<AudioSource>();
-        playPauseButton = transform.Find("ControlButtons/PlayPauseButton/PlayPause").GetComponent<Image>();
+        playPauseButton = transform.Find("MusicBar/Buttons/PlayPauseButton/PlayPause").GetComponent<Image>();
         buttonSE = transform.Find("ButtonSE").GetComponent<AudioSource>();
-        Transform menu = transform.Find("Scroll View/Viewport/MusicMenuContent").transform;
+        playlist = transform.Find("PlaylistMask/Playlist/Scroll View/Viewport/MusicMenuContent").transform;
+        tabIcon = transform.Find("MusicBar/Tab").GetComponent<Image>();
+        currentPlaying = transform.Find("MusicBar/CurrentPlaying").GetComponent<TextMeshProUGUI>();
         animator = GetComponent<Animator>();
         for (int i = 0; i < numMusic; i++) {
-            Transform child = menu.GetChild(i);
+            Transform child = playlist.GetChild(i);
             menuItems[i] = child.GetComponent<TextMeshProUGUI>();
             Button button = child.GetComponent<Button>();
             int temp = i;
             button.onClick.AddListener(() => SwitchTrack(temp));    // use i directly does not work
-            string title = musicItems[i].collected ? musicItems[i].name : "??????";
-            menuItems[i].text = $"{i + 1}.  {title}";
+            menuItems[i].text = getTitle(i);
             if (currentTrack == i) {
                 menuItems[i].color = activeColour;
             } else {
@@ -56,13 +60,16 @@ public class MusicMenuController : MonoBehaviour {
 
     void Update() {
         if (Input.GetButtonDown("Menu")) {
+            if (PauseMenu.paused) return;
             if (show) {
                 animator.SetBool("show", false);
                 show = false;
+                tabIcon.enabled = true;
                 Cursor.lockState = CursorLockMode.Locked;
             } else {
                 animator.SetBool("show", true);
                 show = true;
+                tabIcon.enabled = false;
                 Cursor.lockState = CursorLockMode.None;
             }
         }
@@ -70,6 +77,16 @@ public class MusicMenuController : MonoBehaviour {
             NextTrack(false);
         }
     }
+
+    int CurrentTrack {
+        set {
+            menuItems[currentTrack].color = defaultColour;
+            menuItems[value].color = activeColour;
+            currentTrack = value;
+            currentPlaying.text = menuItems[value].text;
+        }
+    }
+
 
     public void PlayPause() {
         buttonSE.Play();
@@ -98,9 +115,7 @@ public class MusicMenuController : MonoBehaviour {
         while (!musicItems[next].collected) {
             next = (next + 1) % numMusic;
         }
-        menuItems[currentTrack].color = defaultColour;
-        menuItems[next].color = activeColour;
-        currentTrack = next;
+        CurrentTrack = next;
         source.clip = musicItems[next].clip;
         source.Play();
         isPlaying = true;
@@ -114,9 +129,7 @@ public class MusicMenuController : MonoBehaviour {
             prev--;
             if (prev < 0) prev += numMusic;
         } while (!musicItems[prev].collected);
-        menuItems[currentTrack].color = defaultColour;
-        menuItems[prev].color = activeColour;
-        currentTrack = prev;
+        CurrentTrack = prev;
         source.clip = musicItems[prev].clip;
         source.Play();
         isPlaying = true;
@@ -126,10 +139,7 @@ public class MusicMenuController : MonoBehaviour {
     public void SwitchTrack(int i) {
         if (!musicItems[i].collected) return;
         buttonSE.Play();
-        menuItems[currentTrack].color = defaultColour;
-        currentTrack = i;
-        menuItems[i].color = activeColour;
-        source.Stop();
+        CurrentTrack = i;
         source.clip = musicItems[i].clip;
         source.Play();
         isPlaying = true;
@@ -139,6 +149,11 @@ public class MusicMenuController : MonoBehaviour {
     public void AddToCollection(int id) {
         if (musicItems[id].collected) return;
         musicItems[id].collected = true;
-        menuItems[id].text = $"{id + 1}.  {musicItems[id].name}";
+        menuItems[id].text = getTitle(id);
+    }
+
+    string getTitle(int id) {
+        string title = musicItems[id].collected ? musicItems[id].name : "??????";
+        return $"{string.Format("{0:00}", id + 1)}.  {title}";
     }
 }

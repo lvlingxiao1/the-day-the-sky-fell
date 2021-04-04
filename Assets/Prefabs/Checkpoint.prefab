@@ -393,7 +393,10 @@ MonoBehaviour:
       audio: 
       duration: 3
   - sentences:
-    - content: Goodbye tooth-rotting drink. May I never get another cavity!
+    - content: 'Goodbye tooth-rotting drink. '
+      audio: 
+      duration: 2
+    - content: May I never get another cavity!
       audio: 
       duration: 3
   - sentences:
