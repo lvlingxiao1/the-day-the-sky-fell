@@ -1,5 +1,32 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!65 &1333531485089617554
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310362293963696989}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.8365475, y: 0.16857868, z: 0.049999997}
+  m_Center: {x: -0.39327377, y: -0.05928934, z: 0}
+--- !u!136 &8043320632486034104
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5111002298688171454}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.014550013
+  m_Height: 0.052270718
+  m_Direction: 1
+  m_Center: {x: -0.0000716378, y: 0.0044476185, z: 9.313226e-10}
 --- !u!1 &5336275996169009514
 GameObject:
   m_ObjectHideFlags: 0
@@ -117,7 +144,7 @@ Transform:
   m_GameObject: {fileID: 6952849090949933468}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
   - {fileID: 1829736043750224359}
   - {fileID: 5595226856731391748}
@@ -193,6 +220,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43c66f9e28d81814e80bd3ff560b67fb, type: 3}
+--- !u!1 &1310362293963696989 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 43c66f9e28d81814e80bd3ff560b67fb,
+    type: 3}
+  m_PrefabInstance: {fileID: 2228787317555369484}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1829736043750224359 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 43c66f9e28d81814e80bd3ff560b67fb,
@@ -268,6 +301,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d74716d0c054ea34d9af79bf0aaba21b, type: 3}
+--- !u!1 &5111002298688171454 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d74716d0c054ea34d9af79bf0aaba21b,
+    type: 3}
+  m_PrefabInstance: {fileID: 5344792350060073199}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5595226856731391748 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d74716d0c054ea34d9af79bf0aaba21b,
