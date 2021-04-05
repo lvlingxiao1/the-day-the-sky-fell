@@ -56,6 +56,7 @@ public class MusicMenuController : MonoBehaviour {
         }
         source.clip = musicItems[currentTrack].clip;
         source.Play();
+        currentPlaying.text = menuItems[currentTrack].text;
     }
 
     void Update() {

@@ -263,6 +263,49 @@ public class MotionController : MonoBehaviour {
         }
 
         debugText.text = $"{state} {rb.velocity}";
+
+
+
+        /////////// CHEATS /////////////
+        if (Input.GetKeyDown(KeyCode.Keypad1)) {
+            transform.position = new Vector3(-6.139141f, -18.53121f, -102.8717f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.Keypad2)) {
+            transform.position = new Vector3(110.465f, -13.794f, -282.967f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.Keypad3)) {
+            transform.position = new Vector3(239.36f, -32.12f, -393.23f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.Keypad4)) {
+            transform.position = new Vector3(319.6365f, -16.09863f, -437.5951f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.Keypad5)) {
+            transform.position = new Vector3(468.11f, -3.24f, -451.02f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.Keypad6)) {
+            transform.position = new Vector3(498.3731f, -1.98288f, -475.4491f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.Keypad7)) {
+            transform.position = new Vector3(532.3205f, -7.150647f, -504.4659f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.Keypad8)) {
+            transform.position = new Vector3(564.0289f, -17.41118f, -551.7151f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.Keypad9)) {
+            transform.position = new Vector3(574.7895f, -20.05804f, -564.5358f);
+            SetStateNormal();
+        } else if (Input.GetKeyDown(KeyCode.KeypadMultiply)) {
+            var mmc = FindObjectOfType<MusicMenuController>();
+            for (int i = 0; i < mmc.musicItems.Length; i++) {
+                if (!mmc.musicItems[i].collected) { mmc.AddToCollection(i); break; }
+            }
+        } else if (Input.GetKeyDown(KeyCode.KeypadPlus)) {
+            livesMax++;
+        } else if (Input.GetKeyDown(KeyCode.KeypadMinus)) {
+            livesMax--;
+        } else if (Input.GetKeyDown(KeyCode.KeypadPeriod)) {
+            lives = 9999999;
+        }
     }
 
     private void FixedUpdate() {

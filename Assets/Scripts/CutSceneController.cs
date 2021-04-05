@@ -22,8 +22,8 @@ public class CutSceneController : MonoBehaviour {
     }
 
     public void EndCutScene() {
-        mainCamera.enabled = true;
-        cutSceneCamera.enabled = false;
-        UI.enabled = true;
+        //mainCamera.enabled = true;
+        //cutSceneCamera.enabled = false;
+        //UI.enabled = true;
     }
 }

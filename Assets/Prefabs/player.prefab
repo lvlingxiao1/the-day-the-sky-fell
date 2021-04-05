@@ -392,7 +392,7 @@ MonoBehaviour:
   ledgeSpeed: 3
   climbGridSpeed: 2
   livesMax: 0
-  lives: 99999
+  lives: 0
   lastSafePosition: {x: 0, y: 0, z: 0}
   defaultCheckpoint: Checkpoint1
   grounded: 0
