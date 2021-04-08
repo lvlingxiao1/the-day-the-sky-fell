@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RootMotionController : MonoBehaviour {
-    MotionController controller;
+    PlayerController controller;
     Animator animator;
 
     void Awake() {
-        controller = GameObject.Find("Player").GetComponent<MotionController>();
+        controller = GameObject.Find("Player").GetComponent<PlayerController>();
         animator = GetComponent<Animator>();
     }
     private void OnAnimatorMove() {

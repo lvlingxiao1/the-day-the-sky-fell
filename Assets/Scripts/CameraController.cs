@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour {
     Transform mainCamera;
     float fovOffset;
     Transform cameraHandle;
-    MotionController motionController;
+    PlayerController motionController;
 
     [HideInInspector]
     public Vector3 forward;
@@ -33,12 +33,12 @@ public class CameraController : MonoBehaviour {
 
     void Awake() {
         input = FindObjectOfType<PlayerInput>();
-        motionController = FindObjectOfType<MotionController>();
+        motionController = FindObjectOfType<PlayerController>();
         mainCamera = GameObject.Find("Main Camera").transform;
         fovOffset = Mathf.Tan(0.5f * Camera.main.fieldOfView * Mathf.Deg2Rad) * Camera.main.nearClipPlane * Camera.main.aspect + 0.1f;
         cameraHandle = GameObject.Find("CameraHandle").transform;
-        mainCamera.position = cameraHandle.position;
-        mainCamera.rotation = cameraHandle.rotation;
+        //mainCamera.position = cameraHandle.position;
+        //mainCamera.rotation = cameraHandle.rotation;
 
         defaultLocalPosition = cameraHandle.localPosition;
         defaultRotation = transform.localEulerAngles;
@@ -55,6 +55,8 @@ public class CameraController : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        if (!UIController.gameStarted) return;
+
         if (Mathf.Abs(input.cameraHorizontal) < 0.01 && Mathf.Abs(input.cameraVertical) < 0.01) {
             targetRotation.y += input.mouseMoveX * cameraSpeedMouseX * Time.fixedDeltaTime;
             targetRotation.x -= input.mouseMoveY * cameraSpeedMouseY * Time.fixedDeltaTime;
@@ -95,11 +97,9 @@ public class CameraController : MonoBehaviour {
 
         Vector3[] checkDirs = { transform.right, -transform.right, transform.up, -transform.up };
         float lerpRate = 0.3f;
-        foreach (Vector3 dir in checkDirs)
-        {
+        foreach (Vector3 dir in checkDirs) {
             Debug.DrawLine(cameraPlaneCenter, cameraPlaneCenter + dir * fovOffset, Color.red);
-            if (Physics.Raycast(cameraPlaneCenter, dir, out hitInfo, fovOffset, environment))
-            {
+            if (Physics.Raycast(cameraPlaneCenter, dir, out hitInfo, fovOffset, environment)) {
                 lerpRate = 0.7f;
                 newCamWorldPosition += (hitInfo.point - (cameraPlaneCenter + dir * fovOffset));
             }

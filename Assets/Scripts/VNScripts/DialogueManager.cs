@@ -9,7 +9,6 @@ public class DialogueManager : MonoBehaviour {
     public Text dialogueText;
     public Image speakerSprite;
     public Animator dialogueAnimator;
-    public Animator blackScreenAnimator;
     private Sentence[] dialogue;
     private int index;
     private AudioManager audioManager;
@@ -66,10 +65,6 @@ public class DialogueManager : MonoBehaviour {
 
     void EndDialogue() {
         dialogueAnimator.SetBool("isOpen", false);
-        FindObjectOfType<MotionController>().SetStateNormal();
-    }
-
-    public void BlackScreen() {
-        blackScreenAnimator.SetTrigger("start");
+        FindObjectOfType<PlayerController>().SetStateNormal();
     }
 }

@@ -22,7 +22,7 @@ public class CheckpointManager : MonoBehaviour {
         audioManager = FindObjectOfType<AudioManager>();
     }
 
-    public void HandleInteract(MotionController controller, DialogueManager dialogueManager) {
+    public void HandleInteract(PlayerController controller, DialogueManager dialogueManager) {
         if (firstTime && controller.livesMax < LIVES_MAX) {
             controller.livesMax++;
         }
@@ -32,15 +32,15 @@ public class CheckpointManager : MonoBehaviour {
         dialogueManager.StartDialogue(checkpointMessage);
     }
 
-    public void Respawn(MotionController controller, DialogueManager dialogueManager) {
+    public void Respawn(PlayerController controller) {
         if (handled) return;
         audioManager.Play("falling");
         handled = true;
-        dialogueManager.BlackScreen();
+        UIController.BlackScreen();
         StartCoroutine(respawnCoroutine(controller));
     }
 
-    private IEnumerator respawnCoroutine(MotionController controller) {
+    private IEnumerator respawnCoroutine(PlayerController controller) {
         yield return new WaitForSeconds(0.9f);
         CameraController cameraController = FindObjectOfType<CameraController>();
         if (controller.lives > 0) {
@@ -56,11 +56,6 @@ public class CheckpointManager : MonoBehaviour {
         }
         controller.livesUI.SetLives(controller.lives);
         controller.SetStateNormal();
-        // // I think reset all captions is too much... I changed it to just reset the caption of the current vending machine
-        //CaptionDetector[] captionTriggers = FindObjectsOfType<CaptionDetector>();
-        //foreach(CaptionDetector trigger in captionTriggers) {
-        //    trigger.ResetTriggers();
-        //}
         CaptionTrigger caption = GetComponentInChildren<CaptionTrigger>();
         if (caption) caption.ResetTriggers();
         handled = false;

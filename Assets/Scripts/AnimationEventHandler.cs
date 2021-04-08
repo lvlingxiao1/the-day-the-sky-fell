@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class AnimationEventHandler : MonoBehaviour {
     AudioManager audioManager;
-    MotionController controller;
+    PlayerController controller;
     void Awake() {
         audioManager = FindObjectOfType<AudioManager>();
-        controller = FindObjectOfType<MotionController>();
+        controller = FindObjectOfType<PlayerController>();
     }
 
     public void PlayFootstepAudio() {

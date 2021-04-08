@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 7714936468227603473}
   - component: {fileID: 4213786496430724453}
   - component: {fileID: 4213786496430724474}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Dog
   m_TagString: DialogueTrigger
   m_Icon: {fileID: 0}

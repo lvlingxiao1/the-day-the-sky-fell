@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class DelayedCollider : MonoBehaviour {
     private bool isColliding;
-    private BoxCollider collider;
+    private BoxCollider _collider;
     private void Awake() {
-        collider = GetComponent<BoxCollider>();
+        _collider = GetComponent<BoxCollider>();
     }
     private void OnTriggerEnter(Collider other) {
         isColliding = true;
@@ -19,17 +19,17 @@ public class DelayedCollider : MonoBehaviour {
         if (isColliding) {
             StartCoroutine(TryTurnOnCollider());
         } else {
-            collider.isTrigger = false;
+            _collider.isTrigger = false;
         }
     }
     public void TurnOffCollider() {
         StopAllCoroutines();
-        collider.isTrigger = true;
+        _collider.isTrigger = true;
     }
     IEnumerator TryTurnOnCollider() {
         while (isColliding) {
             yield return null;
         }
-        collider.isTrigger = false;
+        _collider.isTrigger = false;
     }
 }

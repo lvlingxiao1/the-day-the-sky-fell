@@ -17,7 +17,7 @@ namespace Climbing
         PlayerInput input;
         Animator anim;
         ClimbIK ik;
-        MotionController mc;
+        PlayerController mc;
         Transform modelTransform;
 
         ClimbObjManager currentClimbObjManager;
@@ -98,7 +98,7 @@ namespace Climbing
         {
             input = FindObjectOfType<PlayerInput>();
             anim = GetComponentInChildren<Animator>();
-            mc = GetComponent<MotionController>();
+            mc = GetComponent<PlayerController>();
             ik = GetComponentInChildren<ClimbIK>();
             modelTransform = GameObject.Find("PlayerModel").transform;
             transitionHint = GameObject.Find("GP_TransitionHint").GetComponent<Text>();

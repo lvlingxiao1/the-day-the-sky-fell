@@ -6,24 +6,36 @@ public class CutSceneController : MonoBehaviour {
     Camera mainCamera;
     Camera cutSceneCamera;
     Animator animator;
-    Canvas UI;
     void Awake() {
         mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         cutSceneCamera = GetComponentInChildren<Camera>();
         animator = GetComponent<Animator>();
-        UI = GameObject.Find("UI").GetComponent<Canvas>();
     }
 
     public void StartCutScene(string cutSceneName) {
         animator.SetTrigger(cutSceneName);
-        UI.enabled = false;
+        UIController.Hide();
         cutSceneCamera.enabled = true;
         mainCamera.enabled = false;
     }
 
     public void EndCutScene() {
-        //mainCamera.enabled = true;
-        //cutSceneCamera.enabled = false;
-        //UI.enabled = true;
+        mainCamera.enabled = true;
+        cutSceneCamera.enabled = false;
+        UIController.Show();
+    }
+
+    public void Credits() {
+        animator.SetTrigger("credits");
+    }
+
+    public void ResetGame() {
+        var originalPosition = GameObject.Find("PlayerStartPos").transform;
+        var player = GameObject.Find("Player").transform;
+        player.position = originalPosition.position;
+        player.rotation = originalPosition.rotation;
+        mainCamera.transform.position = new Vector3(-22.25908f, -15.89375f, -82.46664f);
+        mainCamera.transform.eulerAngles = new Vector3(-5.708f, 93.74001f, 0);
+        UIController.Restart();
     }
 }
