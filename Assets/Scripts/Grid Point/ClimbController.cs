@@ -18,6 +18,7 @@ namespace Climbing
         Animator anim;
         ClimbIK ik;
         PlayerController mc;
+        AudioManager am;
         Transform modelTransform;
 
         ClimbObjManager currentClimbObjManager;
@@ -61,6 +62,7 @@ namespace Climbing
         bool ikLandSideReached;
         bool ikFollowSideReached;
 
+        bool sfxPending;
         bool lockInput;
         bool downBuffered;
         bool confirmFallOff;
@@ -100,6 +102,7 @@ namespace Climbing
             anim = GetComponentInChildren<Animator>();
             mc = GetComponent<PlayerController>();
             ik = GetComponentInChildren<ClimbIK>();
+            am = FindObjectOfType<AudioManager>();
             modelTransform = GameObject.Find("PlayerModel").transform;
             transitionHint = GameObject.Find("GP_TransitionHint").GetComponent<Text>();
             SetCurveReferences();
@@ -420,6 +423,7 @@ namespace Climbing
                 initTransit = true;
                 isRootMovementEnbled = true;
                 rootReached = false;
+                sfxPending = true;
                 ikFollowSideReached = false;
                 ikLandSideReached = false;
                 _time = 0;
@@ -511,6 +515,7 @@ namespace Climbing
                 initTransit = true;
                 isRootMovementEnbled = false;
                 rootReached = false;
+                sfxPending = true;
                 ikFollowSideReached = false;
                 ikLandSideReached = false;
                 _time = 0;
@@ -914,6 +919,19 @@ namespace Climbing
                     //        ik.UpdateSingleIKWeight(AvatarIKGoal.RightFoot, 1);
                     //    }
                     //}
+                    if (sfxPending)
+                    {
+                        sfxPending = false;
+                        am.Play($"climbgrunt{Random.Range(1, 5)}");
+                    }
+                }
+                else
+                {
+                    if (sfxPending)
+                    {
+                        sfxPending = false;
+                        am.Play($"climb{Random.Range(1, 5)}");
+                    }
                 }
                 if (!anim.GetBool("GP_Leap"))
                 {
