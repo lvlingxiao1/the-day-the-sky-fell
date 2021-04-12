@@ -966,7 +966,7 @@ namespace Climbing
                 }
                 else
                 {
-                    transitionHint.text += downBuffered ? "Press [S] Again to Drop Down\n" : "Press [S] to Drop Down\n";
+                    transitionHint.text += downBuffered ? "Press [S] to Drop Down\n" : "Press [S] to Drop Down\n"; // originally "press [S] again"
                 }
             }
 
