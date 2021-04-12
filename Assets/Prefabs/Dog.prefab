@@ -171,11 +171,11 @@ MonoBehaviour:
   - name: Player
     content: Wow it's a dog! I should pet it.
     sprite: {fileID: 21300000, guid: 7a2a228ec0c9277408cfe141b40d4af1, type: 3}
-    audio: bark2
-  - name: Player
-    content: It's so fluffy!
-    sprite: {fileID: 21300000, guid: e09b68dea190210438d1c3584bbd6200, type: 3}
     audio: 
+  - name: Player
+    content: '*Pets Dog* It''s so fluffy!'
+    sprite: {fileID: 21300000, guid: 89327a15a4c9f00479886875d5e1026d, type: 3}
+    audio: bark2
   - name: Player
     content: Ok, take care now!
     sprite: {fileID: 21300000, guid: 7a2a228ec0c9277408cfe141b40d4af1, type: 3}

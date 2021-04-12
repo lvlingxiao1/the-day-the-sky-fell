@@ -5,9 +5,8 @@ using TMPro;
 
 public class CheckpointManager : MonoBehaviour {
     public Vector3 respawnPositionOffset;
-    private Sentence[] checkpointMessage = {
-        new Sentence("", "Drinks replenished", null, "vending machine")
-    };
+    public Sprite getDrink;
+    private Sentence[] checkpointMessage = {null};
     private Vector3 respawnPosition;
     public Vector3 respawnRotation;
     private bool handled = false;
@@ -20,6 +19,7 @@ public class CheckpointManager : MonoBehaviour {
         respawnRotation = transform.eulerAngles;
         respawnRotation.y += 180;
         audioManager = FindObjectOfType<AudioManager>();
+        checkpointMessage[0] = new Sentence("", "Drinks replenished", getDrink, "vending machine");
     }
 
     public void HandleInteract(PlayerController controller, DialogueManager dialogueManager) {

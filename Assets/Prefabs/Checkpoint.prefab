@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnPositionOffset: {x: 0, y: -1.364959, z: 1}
+  getDrink: {fileID: 21300000, guid: f13f7b9c0e2de4f4b8de88ea4d1457b9, type: 3}
   respawnRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &315378776024672499
 GameObject:
